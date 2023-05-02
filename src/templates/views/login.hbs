@@ -1,0 +1,55 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Z-Black</title>
+        <link rel="stylesheet" href="cs/bootstrap/bootstrap.min.css">
+        <link rel="stylesheet" href="cs/style.css">
+        <!-- fontawsm -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <!-- bootstrap -->
+       <link rel="stylesheet" href="../css/bootstrap.min.css">
+    
+            <!-- justvalidate -->
+            <!-- <script src="https://unpkg.com/just-validate@latest/dist/just-validate.production.min.js" defer></script>
+            <script src="js/validation.js" defer></script> -->
+    </head>
+    <style>
+       body{
+          background-image: url(images/829027.jpg);
+          width: 100%;
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
+          scroll-behavior: smooth;
+          overflow-x: hidden;
+  }
+    </style>
+<body>
+  
+     {{>navbar}}
+
+          <div class="container signupForm justify-content-center align-content-center w-50 bg-transparent text-white">
+    
+          <form class="row g-3" action="/login" method="post">
+      <div class="">
+        <label for="username" class="form-label">User Name</label>
+        <input type="text" name="username" class="form-control" id="username" value="" >
+      </div>
+      <div class="">
+        <label for="password" class="form-label">Password</label>
+        <div class="input-group">
+          <input type="password" name="password" class="form-control" id="password">
+          <button type="button" class="btn btn-outline-secondary bi bi-eye-slash" id="togglePassword"></button>
+        </div>
+      </div>
+      <div class="">
+        <button type="submit" name="signin" class="btn btn-primary mt-4">SignIn</button>
+      </div>
+    </form>
+    
+        </div>
+        <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
+</body>
+</html>

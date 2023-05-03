@@ -30,7 +30,7 @@ body{
 }
 
 .nav-gap{
-    column-gap: 40%;
+    column-gap: 30%;
 }
 nav{
     width: 80vw;

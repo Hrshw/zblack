@@ -1,5 +1,5 @@
 // This is your test publishable API key.
-const stripe = Stripe("pk_test_51N2VNzSH1dLYBOto8UGrZmnzYopnBpl12OyFJa6Fx7WuUmM2SaTzNlTl6vp1eP5ZbGAUZ7TKRujxsrvybPMHXJKA00Ee9KhvPG");
+const stripe = Stripe("pk_live_51N2VNzSH1dLYBOtoZdiCdGTAqZKeMNAL69CQIz2pg3p8du3LLaM3YiFGrIauRGzJXHk5KcShCfNZFo1UcpXW8dcI00QOj5r6Gr");
 
 
 let elements;

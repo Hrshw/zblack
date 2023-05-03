@@ -8,7 +8,7 @@ exports.userRegistrationValidator = [
     .isLength({ min: 10, max: 12 }).withMessage('Phone number should be 10 digits long'),
   body('otp').not().isEmpty().withMessage('OTP is required')
     .isNumeric().withMessage('OTP should be numeric')
-    .isLength({ min: 4, max: 6 }).withMessage('OTP should be 6 digits long'),
+    .isLength({ min: 6, max: 6 }).withMessage('OTP should be 6 digits long'),
   body('password').not().isEmpty().trim().withMessage('Password is required'),
   body('confirmpassword').not().isEmpty().trim().withMessage('Confirm password is required')
     .custom((value, { req }) => {

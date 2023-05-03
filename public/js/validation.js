@@ -1,21 +1,21 @@
   
-  const validateReferralNumber = async (referralNumber) => {
-    if (referralNumber !== '') {
-      const response = await fetch('/verifyreferral', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          referralnumber: referralNumber
-        })
-      });
-      const data = await response.json();
-      if (!data.success) {
-        throw new Error('Invalid referral number');
-      }
-    }
-  };
+  // const validateReferralNumber = async (referralNumber) => {
+  //   if (referralNumber !== '') {
+  //     const response = await fetch('/verifyreferral', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json'
+  //       },
+  //       body: JSON.stringify({
+  //         referralnumber: referralNumber
+  //       })
+  //     });
+  //     const data = await response.json();
+  //     if (!data.success) {
+  //       throw new Error('Invalid referral number');
+  //     }
+  //   }
+  // };
   
 
  
@@ -67,7 +67,7 @@
         const emailValue = email.value.trim();
         const passwordValue = password.value.trim();
         const password2Value = password2.value.trim();
-        const otpValue = otp.value.trim();
+        // const otpValue = otp.value.trim();
         const phoneValue = phone.value.trim();
         const referralNumberValue = referralnumber.value.trim();
       
@@ -110,33 +110,38 @@
             setSuccess(password2);
           }
       
-          if (otpValue === '') {
-            setError(otp, 'Please enter your otp');
-          } else if (otpValue.length !== 6) {
-            setError(otp, 'Please enter a valid 6 digit OTP');
-          } else {
-            const response = await fetch('/verifyotp', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                otp: otpValue
-              })
-            });
-            const data = await response.json();
-            if (data.success) {
-              setSuccess(otp);
-            } else {
-              setError(otp, 'Invalid OTP');
-            }
-          }
+          // if (otpValue === '') {
+          //   setError(otp, 'Please enter your otp');
+          // } else if (otpValue.length !== 6) {
+          //   setError(otp, 'Please enter a valid 6 digit OTP');
+          // } else {
+          //   const phoneNumber = phoneValue; // Replace with actual phone number
+          //   const response = await fetch('/verifyotp', {
+          //     method: 'POST',
+          //     headers: {
+          //       'Content-Type': 'application/json'
+          //     },
+          //     body: JSON.stringify({
+          //       phoneNumber,
+          //       otp: otpValue
+          //     })
+          //   });
+          //   const data = await response.json();
+          //   if (data.success) {
+          //     setSuccess(otp);
+          //   } else {
+          //     setError(otp, 'Invalid OTP');
+          //   }
+          // }
+          
       
-          await validateReferralNumber(referralNumberValue);
-          setSuccess(referralnumber);
+          // await validateReferralNumber(referralNumberValue);
+          // setSuccess(referralnumber);
       
-        } catch (error) {
+        } 
+        catch (error) {
           setError(referralnumber, error.message);
         }
+        form.submit();
       };
 });

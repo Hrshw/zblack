@@ -2,7 +2,7 @@ require('dotenv').config({path:'../.env'});
 const express = require('express');
 const path = require('path');
 const app = express();
-const axios = require('axios');
+// const axios = require('axios');
 const hbs = require("hbs");
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
@@ -19,7 +19,7 @@ const session = require('express-session');
 const fast2sms = require('fast-two-sms');
 const otplib = require('otplib');
 const secret = otplib.authenticator.generateSecret();
-
+const cors = require('cors')
 
 
 app.use(session({
@@ -36,8 +36,13 @@ const { time } = require('console');
 const port = process.env.PORT || 3000;
 
 const staticpath = path.join(__dirname, "../public");
+console.log(staticpath);
 const templetespath = path.join(__dirname, "templates/views");
+
 const partialspath = path.join(__dirname, "templates/partials");
+
+// Enable CORS for all routes
+app.use(cors());
 
 app.use(express.json());
 app.use(cookieParser());
@@ -65,6 +70,7 @@ app.get('/login', (req, res) => {
   res.render('login');
 });
 
+
 app.post('/login', async (req, res) => {
   try {
     const username = req.body.username;
@@ -72,7 +78,8 @@ app.post('/login', async (req, res) => {
     const user = await Register.findOne({ username: username });
 
     if (!user) {
-      return res.send("Invalid username!");
+      const errorMessage = "Invalid username!";
+      return res.render('login', { errorMessage });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -87,12 +94,14 @@ app.post('/login', async (req, res) => {
       req.session.userId = user._id; // store the user ID in the session
       res.redirect('/user');
     } else {
-      res.send("Invalid password!");
+      const errorMessage = "Invalid password!";
+      res.render('login', { errorMessage });
     }
 
   } catch (error) {
     console.log(error);
-    res.status(400).send("Invalid credentials!");
+    const errorMessage = "Invalid credentials!";
+    res.render('login', { errorMessage });
   }
 });
 
@@ -150,11 +159,19 @@ app.post('/signup', validateReferralCode, userRegistrationValidator, urlencoded,
     return res.render('signup', { alert });
   }
 
+
+ 
   // Generate referral code and sponsor ID
   const referralCode = shortid.generate();
   const sponsorId = shortid.generate();
 
   const { username, email, phone, otp, password, confirmpassword, referredUsers} = req.body;
+ 
+  // Verify OTP
+ const isOTPValid = otplib.authenticator.check(otp, secret);
+ if (!isOTPValid) {
+   return res.render('signup', { alert: [{ msg: 'Invalid OTP. Please enter a valid OTP.' }] });
+ }
   const referredBy = req.referrer ? req.referrer.referralCode : null;
   const registeruser = new Register({
     username,
@@ -183,16 +200,12 @@ app.post('/signup', validateReferralCode, userRegistrationValidator, urlencoded,
       // Give coins to all previous referrers
       let currentReferrer = referrer;
       while (currentReferrer) {
-        currentReferrer.coins += 5;
+        currentReferrer.coins += 10;
         await currentReferrer.save();
         currentReferrer = await Register.findOne({ referralCode: currentReferrer.referredBy });
       }
     }
   }
-  const userCount = await getUserCount();
-
-    // Render the signup success page with the user data and user count
-    res.render('signup-success', { user, userCount });
   const token = await registeruser.generateAuthToken();
   // Save cookie
   res.cookie('jwt', token, {
@@ -280,10 +293,11 @@ app.post('/sendotp', async (req, res) => {
   const phoneNumber = req.body.phoneNumber;
   const validtime = 300
   const otp = otplib.authenticator.generate(secret,  validtime);
-
+console.log('the otp is :', otp)
+console.log('to the mobile number', phoneNumber);
   const options = {
     authorization: process.env.APIKEYFAST,
-    message: `Your OTP for verification is ${otp} valid upto ${validtime}.`,
+    message: `Your OTP for verification is ${otp} valid upto 5 Min.`,
     numbers: [phoneNumber]
   };
 
@@ -298,22 +312,31 @@ app.post('/sendotp', async (req, res) => {
 });
 
 // verifyotp
-app.post('/verifyotp', (req, res) => {
-  const { phoneNumber, otp } = req.body;
+// app.post('/verifyotp', (req, res) => {
+//   const { phoneNumber, otp } = req.body;
 
-  if (!phoneNumber || !otp) {
-    res.status(400).json({ success: false, message: 'Invalid request' });
-    return;
-  }
+//   console.log('phoneNumber:', phoneNumber);
+//   console.log('otp:', otp);
 
-  const isValid = otplib.authenticator.check(otp, secret);
+//   if (!phoneNumber || !otp) {
+//     res.status(400).json({ success: false, message: 'Invalid request' });
+//     return;
+//   }
 
-  if (isValid) {
-    res.status(200).json({ success: true });
-  } else {
-    res.status(401).json({ success: false, message: 'Invalid OTP' });
-  }
-});
+//   console.log(`phoneNumber: ${phoneNumber}`);
+//   console.log(`otp: ${otp}`);
+
+//   const isValid = otplib.authenticator.check(otp, secret);
+
+//   if (isValid) {
+//     res.status(200).json({ success: true });
+//   } else {
+//     res.status(401).json({ success: false, message: 'Invalid OTP' });
+//   }
+//   console.log(`isValid: ${isValid}`);
+
+// });
+
 
 
 // Start server

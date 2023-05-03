@@ -31,7 +31,10 @@
      {{>navbar}}
 
           <div class="container signupForm justify-content-center align-content-center w-50 bg-transparent text-white">
-    
+{{#if errorMessage}}
+  <div class="alert alert-danger">{{errorMessage}}</div>
+{{/if}}
+
           <form class="row g-3" action="/login" method="post">
       <div class="">
         <label for="username" class="form-label">User Name</label>

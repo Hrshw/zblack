@@ -21,7 +21,7 @@
 </head>
 
 <body class="">
-    {{!-- <div class="container bg-light d-md-flex align-items-center">
+     <div class="container bg-light d-md-flex align-items-center">
         <div class="card box1 shadow-sm p-md-5 p-md-5 p-4">
             <div class="fw-bolder mb-4"><span class="fas fa-dollar-sign"></span><span class="ps-1">200</span></div>
             <div class="d-flex flex-column">
@@ -65,8 +65,8 @@
                 <div id="card-errors"></div>
                 <div id="payment-error"></div>
                 <div id="payment-success"></div>
-                <div id="card-details"> --}}
-                    {{!-- <div class="row">
+                <div id="card-details"> 
+                    <div class="row">
                         <div class="col-12">
                             <div class="d-flex flex-column px-md-5 px-4 mb-4"> <span>Credit Card</span>
                                 <div class="inputWithIcon"> <input class="form-control" type="text" name="cardnumber"
@@ -97,11 +97,7 @@
                         </div>
                         <div class="col-12 px-md-5 px-4 mt-3">
                             <button type="submit" class="btn btn-primary w-100">Pay ₹200</button>
-                        </div> --}}
-                        {{!-- <div id="card-element"> --}}
-                            <!-- Stripe will insert the card input fields here -->
-
-                        {{!-- </div>
+                        </div>
                         <div class="col-12 px-md-5 px-4 mt-3">
                             <button type="submit" class="btn btn-primary w-100">Pay ₹200</button>
                         </div>
@@ -111,12 +107,12 @@
                 <div id="upi-details" style="display:none;">
                     <div class="row">
                         <div class="col-12">
-                            <div class="d-flex flex-column px-md-5 px-4 mb-4"> <span>UPI ID</span> --}}
-                                {{!-- <div class="inputWithIcon"> <input class="form-control" type="text" name="upiid"
+                            <div class="d-flex flex-column px-md-5 px-4 mb-4"> <span>UPI ID</span> 
+                                 <div class="inputWithIcon"> <input class="form-control" type="text" name="upiid"
                                         value="5136 1845 5468 3894"> <span class=""> <img
                                             src="https://www.freepnglogos.com/uploads/mastercard-png/mastercard-logo-logok-15.png"
-                                            alt=""></span> </div> --}}
-                                {{!-- We are Sorry at this time we are not accepting UPI Payments!
+                                            alt=""></span> </div> 
+                                We are Sorry at this time we are not accepting UPI Payments!
                             </div>
                         </div>
                         <div class="col-12 px-md-5 px-4 mt-3">
@@ -128,14 +124,14 @@
 
                 <div id="googlepay-details" style="display:none;">
                     <div class="row">
-                        <div class="col-12"> --}}
-                            {{!-- <div class="d-flex flex-column px-md-5 px-4 mb-4"> <span>Gpay ID</span>
+                        <div class="col-12">
+                             <div class="d-flex flex-column px-md-5 px-4 mb-4"> <span>Gpay ID</span>
                                 <div class="inputWithIcon"> <input class="form-control" type="text" name="gpayid"
                                         value="5136 1845 5468 3894"> <span class=""> <img
                                             src="https://www.freepnglogos.com/uploads/mastercard-png/mastercard-logo-logok-15.png"
                                             alt=""></span> </div>
-                            </div> --}}
-                            {{!-- We are Sorry at this time we are not accepting Gpay Payments!
+                            </div> 
+                            We are Sorry at this time we are not accepting Gpay Payments!
 
                         </div>
                         <div class="col-12 px-md-5 px-4 mt-3">
@@ -143,24 +139,9 @@
                         </div>
                     </div>
                 </div>
-
             </form>
         </div>
-    </div> --}}
-
-  <form id="payment-form">
-      <div id="link-authentication-element">
-        <!--Stripe.js injects the Link Authentication Element-->
-      </div>
-      <div id="payment-element">
-        <!--Stripe.js injects the Payment Element-->
-      </div>
-      <button id="submit">
-        <div class="spinner hidden" id="spinner"></div>
-        <span id="button-text">Pay now</span>
-      </button>
-      <div id="payment-message" class="hidden"></div>
-    </form>
+    </div> 
 </body>
 
 <script src="../jq/jquery.js"></script>

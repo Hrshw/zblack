@@ -1,4 +1,4 @@
-require('dotenv').config({path:'../.env'});
+require('dotenv').config({ path: '../.env' });
 const express = require('express');
 const path = require('path');
 const app = express();
@@ -16,6 +16,7 @@ const { userRegistrationValidator } = require('./middleware/validate');
 const { validateReferralCode } = require('./middleware/checkReferrels');
 const handleReferral = require('./updatecoins');
 const session = require('express-session');
+const Razorpay = require('razorpay');
 const fast2sms = require('fast-two-sms');
 const otplib = require('otplib');
 const secret = otplib.authenticator.generateSecret();
@@ -31,12 +32,10 @@ app.use(session({
 // database related code
 require("./database/conn");
 const Register = require("./database/userschema");
-const { time } = require('console');
 
 const port = process.env.PORT || 3000;
 
 const staticpath = path.join(__dirname, "../public");
-console.log(staticpath);
 const templetespath = path.join(__dirname, "templates/views");
 
 const partialspath = path.join(__dirname, "templates/partials");
@@ -49,6 +48,12 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 const urlencoded = bodyParser.urlencoded({ extended: false });
 
+
+// Razorpay intigration
+const razorpay = new Razorpay({
+  key_id: "rzp_test_ckPs2gv6fjSOim",
+  key_secret: "KrnQjlNYvCA4tJK5oXZoMX6X",
+});
 
 
 // middlewares
@@ -64,6 +69,9 @@ hbs.registerPartials(partialspath);
 
 app.get('/', (req, res) => {
   res.render('index');
+});
+app.get('/about', (req, res) => {
+  res.render('about');
 });
 
 app.get('/login', (req, res) => {
@@ -130,8 +138,8 @@ app.get('/user', auth, async (req, res) => {
       return res.redirect('/login');
     }
     const userCount = await getUserCount();
-    res.render('user', { user, userCount  }); // render the user template and pass user data
-    
+    res.render('user', { user, userCount }); // render the user template and pass user data
+
 
   } catch (error) {
     console.log(error);
@@ -160,18 +168,18 @@ app.post('/signup', validateReferralCode, userRegistrationValidator, urlencoded,
   }
 
 
- 
+
   // Generate referral code and sponsor ID
   const referralCode = shortid.generate();
   const sponsorId = shortid.generate();
 
-  const { username, email, phone, otp, password, confirmpassword, referredUsers} = req.body;
- 
+  const { username, email, phone, otp, password, confirmpassword, referredUsers } = req.body;
+
   // Verify OTP
- const isOTPValid = otplib.authenticator.check(otp, secret);
- if (!isOTPValid) {
-   return res.render('signup', { alert: [{ msg: 'Invalid OTP. Please enter a valid OTP.' }] });
- }
+  const isOTPValid = otplib.authenticator.check(otp, secret);
+  if (!isOTPValid) {
+    return res.render('signup', { alert: [{ msg: 'Invalid OTP. Please enter a valid OTP.' }] });
+  }
   const referredBy = req.referrer ? req.referrer.referralCode : null;
   const registeruser = new Register({
     username,
@@ -188,7 +196,7 @@ app.post('/signup', validateReferralCode, userRegistrationValidator, urlencoded,
     directReferredUsers: 0,
     indirectReferredUsers: 0
   });
-  
+
   // Add referred users to the user's document
   if (req.referrer) {
     const referrer = await Register.findOne({ referralCode: referredBy });
@@ -196,7 +204,7 @@ app.post('/signup', validateReferralCode, userRegistrationValidator, urlencoded,
       registeruser.referralChain = [...referrer.referralChain, referredBy];
       referrer.referredUsers.push(registeruser._id);
       await referrer.save();
-      
+
       // Give coins to all previous referrers
       let currentReferrer = referrer;
       while (currentReferrer) {
@@ -216,7 +224,7 @@ app.post('/signup', validateReferralCode, userRegistrationValidator, urlencoded,
   try {
     await registeruser.save();
     console.log('User saved to database');
-    
+
     // Handle referral
     const handleReferralResult = await handleReferral(referralCode, referredBy);
     console.log(handleReferralResult);
@@ -228,73 +236,17 @@ app.post('/signup', validateReferralCode, userRegistrationValidator, urlencoded,
   }
 });
 
-const stripe = require('stripe')(process.env.KEY);
-
-
-app.post("/create-payment-intent", async (req, res) => {
-  const { items } = req.body;
-
-  // Calculate the total amount
-  const amount = 200;
-
-  // Create a PaymentIntent with the specified amount
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount,
-    currency: "inr",
-    payment_method_types: ["card"],
-    metadata: {
-      integration_check: "accept_a_payment",
-      items: JSON.stringify(items),
-    },
-  });
-
-  // Return the client secret to the client-side
-  res.json({ clientSecret: paymentIntent.client_secret });
-});
-
-
-app.post('/webhook', express.raw({type: 'application/json'}), async (request, response) => {
-  const sig = request.headers['stripe-signature'];
-
-  let event;
-
-  try {
-    event = stripe.webhooks.constructEvent(request.body, sig, process.env.endpointSecret);
-  } catch (err) {
-    response.status(400).send(`Webhook Error: ${err.message}`);
-    return;
-  }
-
-  // Handle the event
-  if (event.type === 'payment_intent.succeeded') {
-    const paymentIntent = event.data.object;
-    const email = paymentIntent.metadata.email;
-    const amount = paymentIntent.amount;
-    const currency = paymentIntent.currency;
-    const paymentId = paymentIntent.id;
-
-    try {
-      // Update the user's document with the payment details
-      const user = await Register.findOneAndUpdate({email}, {payment: {amount, currency, paymentId}, paymentStatus: 'success'}, {new: true});
-      console.log(`user ${email} updated with payment details`);
-    } catch (err) {
-      console.error(`Error updating user ${email}: ${err}`);
-    }
-  }
-
-  // Return a response to acknowledge receipt of the event
-  response.json({received: true});
-});
 
 
 
-// Generate and send OTP to user's phone number
+
+// // Generate and send OTP to user's phone number
 app.post('/sendotp', async (req, res) => {
   const phoneNumber = req.body.phoneNumber;
   const validtime = 300
-  const otp = otplib.authenticator.generate(secret,  validtime);
-console.log('the otp is :', otp)
-console.log('to the mobile number', phoneNumber);
+  const otp = otplib.authenticator.generate(secret, validtime);
+  console.log('the otp is :', otp)
+  console.log('to the mobile number', phoneNumber);
   const options = {
     authorization: process.env.APIKEYFAST,
     message: `Your OTP for verification is ${otp} valid upto 5 Min.`,
@@ -311,32 +263,38 @@ console.log('to the mobile number', phoneNumber);
   }
 });
 
-// verifyotp
-// app.post('/verifyotp', (req, res) => {
-//   const { phoneNumber, otp } = req.body;
 
-//   console.log('phoneNumber:', phoneNumber);
-//   console.log('otp:', otp);
+app.post('/payment', async (req, res) => {
+  try {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, amount, currency, name, email, contact } = req.body;
 
-//   if (!phoneNumber || !otp) {
-//     res.status(400).json({ success: false, message: 'Invalid request' });
-//     return;
-//   }
+    // Verify the Razorpay signature
+    const hmac = crypto.createHmac('sha256', process.env.KEY_SECRET);
+    hmac.update(`${razorpay_order_id}|${razorpay_payment_id}`);
+    const calculatedSignature = hmac.digest('hex');
+    if (calculatedSignature !== razorpay_signature) {
+      return res.status(400).json({ error: 'Invalid signature' });
+    }
 
-//   console.log(`phoneNumber: ${phoneNumber}`);
-//   console.log(`otp: ${otp}`);
+    // Find the user by email and save payment data to their document in the database
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      return res.status(400).json({ error: 'User not found' });
+    }
+    
+    user.payments.push({
+      amount: amount,
+      currency: currency,
+      paymentId: razorpay_payment_id
+    });
+    await user.save();
 
-//   const isValid = otplib.authenticator.check(otp, secret);
-
-//   if (isValid) {
-//     res.status(200).json({ success: true });
-//   } else {
-//     res.status(401).json({ success: false, message: 'Invalid OTP' });
-//   }
-//   console.log(`isValid: ${isValid}`);
-
-// });
-
+    res.status(200).json({ message: 'Payment successfull' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 
 // Start server

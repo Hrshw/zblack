@@ -55,15 +55,13 @@
         <label for="phone" class="form-label">Phone</label>
         <input type="number" name="phone" class="form-control" id="phone" value="">
         <div class="error"></div>
-        <button class="btn btn-dark mt-1" id="sendOtpBtn">Send OTP</button>
       </div>
       <div class="input-control">
         <label for="otp" class="form-label">Enter Your OTP</label>
         <input type="number" name="otp" class="form-control" id="otp">
         <div class="error"></div>
-        <button class="btn btn-dark mt-1 d-none" id="verifyOtpBtn">Verify OTP</button>
-        <div id="send-otp-message"></div>
-        <div id="verify-otp-message"></div>
+        <div id="send-otp-message" class=" text-success"></div>
+        <div id="verify-otp-message" class=" text-success"></div>
       </div>
       {{!-- <div class="input-control">
         <label for="password" class="form-label">Password</label>
@@ -89,6 +87,10 @@
       </div>
       <div class="">
         <button type="submit" name="createAccount" class="btn btn-primary mt-4">Create Account</button>
+      </div>
+      <div class="loginIfAcount">
+        <h4>Already have a acount?</h4>
+        <a class=" text-light" href="/login">Login</a>
       </div>
     </form>
 

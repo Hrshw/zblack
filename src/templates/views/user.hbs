@@ -146,7 +146,7 @@
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                            <li><a class="dropdown-item" id="logout-button">Logout</a></li>
                         </ul>
                     </div>
                 </div>
@@ -206,6 +206,22 @@
     </div>
 
     <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
+    <script>
+  $('#logout-button').on('click', function() {
+    $.ajax({
+      url: '/logout',
+      method: 'POST',
+      success: function(response) {
+        // Handle successful logout, such as redirecting the user to the login page
+        window.location.href = '/login';
+      },
+      error: function(error) {
+        // Handle error, such as displaying an error message to the user
+        console.log(error);
+      }
+    });
+  });
+</script>
 </body>
 
 </html>

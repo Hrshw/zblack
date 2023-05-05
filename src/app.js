@@ -113,10 +113,16 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.post('/logout', async (req, res) => {
+app.post('/logout', auth, async (req, res) => {
   try {
+    if (!req.user) {
+      // If req.user is undefined, the user is not logged in
+      return res.redirect('/login');
+    }
+
     // Remove the user's token from the tokens array
     req.user.tokens = req.user.tokens.filter(token => token.token !== req.token);
+
     // Save the updated user document
     await req.user.save();
 
@@ -130,6 +136,9 @@ app.post('/logout', async (req, res) => {
   }
 });
 
+
+
+
 app.get('/user', auth, async (req, res) => {
   try {
     const user = await Register.findById(req.session.userId); // get the user data from the session
@@ -139,11 +148,12 @@ app.get('/user', auth, async (req, res) => {
     }
     const userCount = await getUserCount();
     res.render('user', { user, userCount }); // render the user template and pass user data
-
-
   } catch (error) {
+    if (error.name === 'JsonWebTokenError') {
+      return res.redirect('/login');
+    }
     console.log(error);
-    res.redirect('/login');
+    res.status(500).send('Server Error');
   }
 });
 

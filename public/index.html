@@ -403,20 +403,34 @@
   <script src="../js/bootstrap.js"></script>
   <script>
 
-const checkoutButton = document.querySelector('#checkout-button');
-const myAlert = document.querySelector('#my-alert');
+const myAlert = document.getElementById('myAlert');
+const checkoutButton = document.getElementById('checkout-button');
 
 checkoutButton.addEventListener('click', () => {
-  fetch('/checklogin', { credentials: 'include' })
+  // Check if the user is logged in
+  fetch('/user')
     .then((response) => {
       if (response.ok) {
         // User is logged in, redirect to checkout page
-        window.location.href = '/checkout';
+        fetch('/Login')
+          .then((isLoggedInResponse) => {
+            if (isLoggedInResponse.ok) {
+              window.location.href = '/checkout';
+            } else {
+              myAlert.innerHTML = 'You need to log in to make a purchase.';
+              myAlert.classList.add('alert-danger');
+              myAlert.classList.remove('d-none');
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+            myAlert.innerHTML = 'An error occurred while checking your login status.';
+            myAlert.classList.add('alert-danger');
+            myAlert.classList.remove('d-none');
+          });
       } else {
-        // User is not logged in, show an error message
-        myAlert.innerHTML = 'You need to log in to make a purchase.';
-        myAlert.classList.add('alert-danger');
-        myAlert.classList.remove('d-none');
+        // User is not logged in, redirect to login page
+        window.location.href = '/login.html';
       }
     })
     .catch((error) => {
@@ -430,7 +444,6 @@ checkoutButton.addEventListener('click', () => {
     myAlert.classList.add('d-none');
   }, 3000);
 });
-
 
 
 

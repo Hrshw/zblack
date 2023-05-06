@@ -126,10 +126,6 @@ app.get('/checkout', auth, (req, res) => {
 });
 
 
-app.get('/checklogin', auth, (req, res) => {
-  res.status(200).send('OK');
-});
-
 
 app.post('/logout', auth, async (req, res) => {
   try {

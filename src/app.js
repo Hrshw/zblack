@@ -16,7 +16,7 @@ const { userRegistrationValidator } = require('./middleware/validate');
 const { validateReferralCode } = require('./middleware/checkReferrels');
 const handleReferral = require('./updatecoins');
 const session = require('express-session');
-const Razorpay = require('razorpay');
+// const Razorpay = require('razorpay');
 const fast2sms = require('fast-two-sms');
 const otplib = require('otplib');
 const secret = otplib.authenticator.generateSecret();
@@ -49,11 +49,11 @@ app.use(express.urlencoded({ extended: false }));
 const urlencoded = bodyParser.urlencoded({ extended: false });
 
 
-// Razorpay intigration
-const razorpay = new Razorpay({
-  key_id: "rzp_test_ckPs2gv6fjSOim",
-  key_secret: "KrnQjlNYvCA4tJK5oXZoMX6X",
-});
+// // Razorpay intigration
+// const razorpay = new Razorpay({
+//   key_id: "rzp_test_ckPs2gv6fjSOim",
+//   key_secret: "KrnQjlNYvCA4tJK5oXZoMX6X",
+// });
 
 
 // middlewares
@@ -113,6 +113,24 @@ app.post('/login', async (req, res) => {
   }
 });
 
+
+
+app.get('/checkout', auth, (req, res) => {
+  if (!req.user) {
+    // User is not authenticated, show error message or redirect to login page
+    res.send('You must be logged in to access the checkout page.');
+  } else {
+    // User is authenticated, render the checkout page
+    res.render('checkout');
+  }
+});
+
+
+app.get('/checklogin', auth, (req, res) => {
+  res.status(200).send('OK');
+});
+
+
 app.post('/logout', auth, async (req, res) => {
   try {
     if (!req.user) {
@@ -135,7 +153,6 @@ app.post('/logout', auth, async (req, res) => {
     res.status(500).send();
   }
 });
-
 
 
 
@@ -250,7 +267,7 @@ app.post('/signup', validateReferralCode, userRegistrationValidator, urlencoded,
 
 
 
-// // Generate and send OTP to user's phone number
+// Generate and send OTP to user's phone number
 app.post('/sendotp', async (req, res) => {
   const phoneNumber = req.body.phoneNumber;
   const validtime = 300
@@ -274,37 +291,37 @@ app.post('/sendotp', async (req, res) => {
 });
 
 
-app.post('/payment', async (req, res) => {
-  try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, amount, currency, name, email, contact } = req.body;
+// app.post('/payment', async (req, res) => {
+//   try {
+//     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, amount, currency, name, email, contact } = req.body;
 
-    // Verify the Razorpay signature
-    const hmac = crypto.createHmac('sha256', process.env.KEY_SECRET);
-    hmac.update(`${razorpay_order_id}|${razorpay_payment_id}`);
-    const calculatedSignature = hmac.digest('hex');
-    if (calculatedSignature !== razorpay_signature) {
-      return res.status(400).json({ error: 'Invalid signature' });
-    }
+//     // Verify the Razorpay signature
+//     const hmac = crypto.createHmac('sha256', process.env.KEY_SECRET);
+//     hmac.update(`${razorpay_order_id}|${razorpay_payment_id}`);
+//     const calculatedSignature = hmac.digest('hex');
+//     if (calculatedSignature !== razorpay_signature) {
+//       return res.status(400).json({ error: 'Invalid signature' });
+//     }
 
-    // Find the user by email and save payment data to their document in the database
-    const user = await User.findOne({ email: email });
-    if (!user) {
-      return res.status(400).json({ error: 'User not found' });
-    }
+//     // Find the user by email and save payment data to their document in the database
+//     const user = await Register.findOne({ email: email });
+//     if (!user) {
+//       return res.status(400).json({ error: 'User not found' });
+//     }
     
-    user.payments.push({
-      amount: amount,
-      currency: currency,
-      paymentId: razorpay_payment_id
-    });
-    await user.save();
+//     user.payments.push({
+//       amount: amount,
+//       currency: currency,
+//       paymentId: razorpay_payment_id
+//     });
+//     await user.save();
 
-    res.status(200).json({ message: 'Payment successfull' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
+//     res.status(200).json({ message: 'Payment successfull' });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// });
 
 
 // Start server

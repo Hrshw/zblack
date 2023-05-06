@@ -21,6 +21,7 @@
 </head>
 
 <body class="bg-dark">
+
   <section class="header">
 <div class="navbar position-absolute w-100">
   <nav class="navbar navbar-expand-lg navbar-dark w-100" style="z-index: 2;">
@@ -245,7 +246,7 @@
               </div>
           </div>
           <div class="col-xl-4 col-lg-4 col-md-6">
-              
+            <div class="alert d-none" role="alert" id="myAlert"></div>
           </div>
       </div>
   </div>
@@ -402,11 +403,37 @@
   <script src="../js/bootstrap.js"></script>
   <script>
 
-const checkoutButton = document.getElementById('checkout-button');
+const checkoutButton = document.querySelector('#checkout-button');
+const myAlert = document.querySelector('#my-alert');
 
 checkoutButton.addEventListener('click', () => {
-  window.location.href = '/checkout.html';
+  fetch('/checklogin', { credentials: 'include' })
+    .then((response) => {
+      if (response.ok) {
+        // User is logged in, redirect to checkout page
+        window.location.href = '/checkout';
+      } else {
+        // User is not logged in, show an error message
+        myAlert.innerHTML = 'You need to log in to make a purchase.';
+        myAlert.classList.add('alert-danger');
+        myAlert.classList.remove('d-none');
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      myAlert.innerHTML = 'An error occurred while checking your login status.';
+      myAlert.classList.add('alert-danger');
+      myAlert.classList.remove('d-none');
+    });
+
+  setTimeout(() => {
+    myAlert.classList.add('d-none');
+  }, 3000);
 });
+
+
+
+
 
 
 $(window).scroll(function() {

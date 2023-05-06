@@ -34,7 +34,8 @@ const handleReferral = async (referralCode, referredBy) => {
     await Register.updateOne({ referralCode: referredBy }, { $set: { referredUsers } });
 
     // Update sponsor user's coins
-    sponsorUser.coins += 15;
+    const minusTeen = 10;
+    sponsorUser.coins += 20 - 10;
     await Register.updateOne({ referralCode: referredBy }, { $set: { coins: sponsorUser.coins } });
 
 

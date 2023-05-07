@@ -15,15 +15,15 @@
     const username = document.getElementById('username');
     const email = document.getElementById('email');
     const password = document.getElementById('password');
-    const otp = document.getElementById('otp');
+    // const otp = document.getElementById('otp');
     const phone = document.getElementById('phone')
-    const referralnumber = document.getElementById('referralnumber');
+    // const referralnumber = document.getElementById('referralnumber');
     const password2 = document.getElementById('confirmpassword');
 
     form.addEventListener('submit', e => {
         e.preventDefault();
-
-        validateInputs();
+        validateInputs()
+         
     });
 
     const setError = (element, message) => {
@@ -53,14 +53,14 @@
         return re.test(phone);
       };
       
-    const validateInputs = async () => {
+    const validateInputs = () => {
         const usernameValue = username.value.trim();
         const emailValue = email.value.trim();
         const passwordValue = password.value.trim();
         const password2Value = password2.value.trim();
-        const otpValue = otp.value.trim();
+        // const otpValue = otp.value.trim();
         const phoneValue = phone.value.trim();
-        const referralNumberValue = referralnumber.value.trim();
+        // const referralNumberValue = referralnumber.value.trim();
       
          {
           if (usernameValue === '') {
@@ -139,6 +139,7 @@
         // catch (error) {
         //   setError(referralnumber, error.message);
         // }
-        
+
+          form.submit();
       };
 });

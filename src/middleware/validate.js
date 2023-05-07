@@ -1,11 +1,37 @@
 const { body, validationResult } = require('express-validator');
+const User = require("../database/userschema");
 
 exports.userRegistrationValidator = [
-  body('username').not().isEmpty().trim().withMessage('Username is required'),
-  body('email').not().isEmpty().trim().withMessage('Email is required'),
-  body('phone').not().isEmpty().withMessage('Phone number is required')
+  body('username')
+    .not().isEmpty().trim().withMessage('Username is required')
+    .custom(async (value) => {
+      const user = await User.findOne({ username: value });
+      if (user) {
+        throw new Error('Username is already in use');
+      }
+      return true;
+    }),
+  body('email')
+    .not().isEmpty().trim().withMessage('Email is required')
+    .isEmail().withMessage('Invalid email address')
+    .custom(async (value) => {
+      const user = await User.findOne({ email: value });
+      if (user) {
+        throw new Error('Email is already in use');
+      }
+      return true;
+    }),
+  body('phone')
+    .not().isEmpty().withMessage('Phone number is required')
     .isNumeric().withMessage('Phone number should be numeric')
-    .isLength({ min: 10, max: 12 }).withMessage('Phone number should be 10 digits long'),
+    .isLength({ min: 10, max: 12 }).withMessage('Phone number should be 10 digits long')
+    .custom(async (value) => {
+      const user = await User.findOne({ phone: value });
+      if (user) {
+        throw new Error('Phone number is already in use');
+      }
+      return true;
+    }),
   body('otp').not().isEmpty().withMessage('OTP is required')
     .isNumeric().withMessage('OTP should be numeric')
     .isLength({ min: 6, max: 6 }).withMessage('OTP should be 6 digits long'),
@@ -17,7 +43,7 @@ exports.userRegistrationValidator = [
       }
       return true;
     }),
-  (req, res, next) => {
+  async (req, res, next) => {
     console.log('userRegistrationValidator middleware executed');
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

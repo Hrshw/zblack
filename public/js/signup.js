@@ -26,3 +26,4 @@ phoneNumberInput.addEventListener('change', async (event) => {
     sendOtpMessage.innerText = 'Failed to send OTP';
   }
 });
+

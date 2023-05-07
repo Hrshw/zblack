@@ -16,10 +16,10 @@ const { userRegistrationValidator } = require('./middleware/validate');
 const { validateReferralCode } = require('./middleware/checkReferrels');
 const handleReferral = require('./updatecoins');
 const session = require('express-session');
-// const Razorpay = require('razorpay');
 const fast2sms = require('fast-two-sms');
-const otplib = require('otplib');
-const secret = otplib.authenticator.generateSecret();
+const speakeasy = require('speakeasy');
+// const otplib = require('otplib');
+// const secret = otplib.authenticator.generateSecret();
 const cors = require('cors')
 
 
@@ -47,13 +47,6 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 const urlencoded = bodyParser.urlencoded({ extended: false });
-
-
-// // Razorpay intigration
-// const razorpay = new Razorpay({
-//   key_id: "rzp_test_ckPs2gv6fjSOim",
-//   key_secret: "KrnQjlNYvCA4tJK5oXZoMX6X",
-// });
 
 
 // middlewares
@@ -192,19 +185,18 @@ app.post('/signup', validateReferralCode, userRegistrationValidator, urlencoded,
     return res.render('signup', { alert });
   }
 
-
-
   // Generate referral code and sponsor ID
   const referralCode = shortid.generate();
   const sponsorId = shortid.generate();
 
   const { username, email, phone, otp, password, confirmpassword, referredUsers } = req.body;
 
-  // Verify OTP
-  const isOTPValid = otplib.authenticator.check(otp, secret);
-  if (!isOTPValid) {
-    return res.render('signup', { alert: [{ msg: 'Invalid OTP. Please enter a valid OTP.' }] });
-  }
+   // Verify OTP
+   const secret = process.env.SECRET_KEY;
+   const isOTPValid = speakeasy.totp.verify({ secret, token: otp, window: 5 * 60 });
+   if (!isOTPValid) {
+     return res.render('signup', { alert: [{ msg: 'Invalid OTP. Please enter a valid OTP.' }] });
+   }
   const referredBy = req.referrer ? req.referrer.referralCode : null;
   const registeruser = new Register({
     username,
@@ -265,19 +257,22 @@ app.post('/signup', validateReferralCode, userRegistrationValidator, urlencoded,
 
 
 
+
 // Generate and send OTP to user's phone number
 app.post('/sendotp', async (req, res) => {
   const phoneNumber = req.body.phoneNumber;
-  const validtime = 300
-  const otp = otplib.authenticator.generate(secret, validtime);
-  console.log('the otp is :', otp)
-  console.log('to the mobile number', phoneNumber);
+  const otp = speakeasy.totp({
+    secret: process.env.SECRET_KEY,
+    digits: 6,
+    window: 5 * 60 // OTP will be valid for 5 minutes
+  });
+  console.log('the otp is:', otp);
+  console.log('to the mobile number:', phoneNumber);
   const options = {
     authorization: process.env.APIKEYFAST,
     message: `Your OTP for verification is ${otp} valid upto 5 Min.`,
     numbers: [phoneNumber]
   };
-
   try {
     const response = await fast2sms.sendMessage(options);
     console.log(response);
@@ -289,47 +284,34 @@ app.post('/sendotp', async (req, res) => {
 });
 
 
-// app.post('/payment', async (req, res) => {
-//   try {
-//     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, amount, currency, name, email, contact } = req.body;
+app.get('/check-existing', async (req, res) => {
+  const { username, email, phone } = req.query;
 
-//     // Verify the Razorpay signature
-//     const hmac = crypto.createHmac('sha256', process.env.KEY_SECRET);
-//     hmac.update(`${razorpay_order_id}|${razorpay_payment_id}`);
-//     const calculatedSignature = hmac.digest('hex');
-//     if (calculatedSignature !== razorpay_signature) {
-//       return res.status(400).json({ error: 'Invalid signature' });
-//     }
+  const userByUsername = await Register.findOne({ username });
+  const userByEmail = await Register.findOne({ email });
+  const userByPhone = await Register.findOne({ phone });
 
-//     // Find the user by email and save payment data to their document in the database
-//     const user = await Register.findOne({ email: email });
-//     if (!user) {
-//       return res.status(400).json({ error: 'User not found' });
-//     }
-    
-//     user.payments.push({
-//       amount: amount,
-//       currency: currency,
-//       paymentId: razorpay_payment_id
-//     });
-//     await user.save();
-
-//     res.status(200).json({ message: 'Payment successfull' });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: 'Server error' });
-//   }
-// });
-
-
-// check referrelcode
-app.get('/api/validate-referral-code', validateReferralCode, (req, res) => {
-  if (req.referrer) {
-    res.status(200).json({ isValid: true });
-  } else {
-    res.status(400).json({ isValid: false });
+  const errors = {};
+  if (userByUsername) {
+    errors.username = 'Username already exists';
   }
+  if (userByEmail) {
+    errors.email = 'Email already exists';
+  }
+  if (userByPhone) {
+    errors.phone = 'Phone number already exists';
+  }
+
+  if (Object.keys(errors).length > 0) {
+    return res.status(400).json({ errors });
+  }
+
+  return res.status(200).json({ message: 'No user found with this username, email, or phone number' });
 });
+
+
+
+
 // Start server
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);

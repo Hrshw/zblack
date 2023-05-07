@@ -42,23 +42,23 @@
       {{/if}}
       <div class="input-control">
         <label for="username" class="form-label">User Name</label>
-        <input type="text" name="username" class="form-control {{#if alert.username}}alert-danger{{/if}}" id="username"
+        <input type="text" name="username" class="form-control" id="username"
           value="{{username}}">
         <div class="error"></div>
       </div>
       <div class="input-control">
         <label for="email" class="form-label">Email</label>
-        <input type="email" name="email" class="form-control" id="email" aria-describedby="inputGroupPrepend2" value="">
+        <input type="email" name="email" class="form-control" id="email" aria-describedby="inputGroupPrepend2" value="{{email}}">
         <div class="error"></div>
       </div>
       <div class="input-control">
         <label for="phone" class="form-label">Phone</label>
-        <input type="number" name="phone" class="form-control" id="phone" value="">
+        <input type="number" name="phone" class="form-control" id="phone" value="{{phone}}">
         <div class="error"></div>
       </div>
       <div class="input-control">
         <label for="otp" class="form-label">Enter Your OTP</label>
-        <input type="number" name="otp" class="form-control" id="otp">
+        <input type="number" name="otp" class="form-control" id="otp" value="{{otp}}">
         <div class="error"></div>
         <div id="send-otp-message" class=" text-success"></div>
         <div id="verify-otp-message" class=" text-success"></div>
@@ -72,17 +72,17 @@
       </div> --}}
       <div class="input-control">
         <label for="password" class="form-label">Password</label>
-        <input type="password" name="password" class="form-control" id="password">
+        <input type="password" name="password" class="form-control" id="password" value="{{password}}">
         <div class="error"></div>
       </div>
       <div class="input-control">
         <label for="confirmpassword" class="form-label">Confirm Password</label>
-        <input type="password" name="confirmpassword" class="form-control" id="confirmpassword">
+        <input type="password" name="confirmpassword" class="form-control" id="confirmpassword" value="{{confirmpassword}}">
         <div class="error"></div>
       </div>
       <div class="input-control">
         <label for="referralnumber" class="form-label">Referral Code</label>
-        <input type="text" name="referralCode" class="form-control" id="referralnumber" value="">
+        <input type="text" name="referralCode" class="form-control" id="referralnumber" value="{{referralCode}}">
         <div class="error"></div>
       </div>
       <div class="">

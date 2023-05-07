@@ -67,11 +67,22 @@ app.set("view engine", "hbs");
 app.set("views", templetespath);
 hbs.registerPartials(partialspath);
 
+
 app.get('/', (req, res) => {
   res.render('index');
 });
 app.get('/about', (req, res) => {
   res.render('about');
+});
+
+app.get('/checkout', auth, (req, res) => {
+  if (!req.user) {
+    // User is not authenticated, show error message or redirect to login page
+    res.send('You must be logged in to access the checkout page.');
+  } else {
+    // User is authenticated, render the checkout page
+    res.render('checkout');
+  }
 });
 
 app.get('/login', (req, res) => {
@@ -115,15 +126,6 @@ app.post('/login', async (req, res) => {
 
 
 
-app.get('/checkout', auth, (req, res) => {
-  if (!req.user) {
-    // User is not authenticated, show error message or redirect to login page
-    res.send('You must be logged in to access the checkout page.');
-  } else {
-    // User is authenticated, render the checkout page
-    res.render('checkout');
-  }
-});
 
 
 
@@ -320,6 +322,14 @@ app.post('/sendotp', async (req, res) => {
 // });
 
 
+// check referrelcode
+app.get('/api/validate-referral-code', validateReferralCode, (req, res) => {
+  if (req.referrer) {
+    res.status(200).json({ isValid: true });
+  } else {
+    res.status(400).json({ isValid: false });
+  }
+});
 // Start server
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);

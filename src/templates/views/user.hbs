@@ -11,11 +11,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
         integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css"
-        integrity="sha384-b6lVK+yci+bfDmaY1u0zE8YYJt0TZxLEAFyYSLHId4xoVvsrQu3INevFKo+Xir8e" crossorigin="anonymous">
+    {{!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css"
+        integrity="sha384-b6lVK+yci+bfDmaY1u0zE8YYJt0TZxLEAFyYSLHId4xoVvsrQu3INevFKo+Xir8e" crossorigin="anonymous"> --}}
 </head>
 
 <body class="bg-dark">
+    {{>navbar}}
     <div class="container-fluid">
         <div class="row flex-nowrap">
             <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
@@ -146,13 +147,14 @@
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                            <li><a class="dropdown-item" id="logout-button">Logout</a></li>
                         </ul>
                     </div>
                 </div>
             </div>
 
             <div class="col py-3 mt-5">
+                <div class="bg-info mb-5 text-center rounded"><p class="text-light fs-2">Please make pataince we will woking on it, to give you best services. 😊</p></div>
                 <div class="userSection row justify-content-evenly">
                     <div class="userInfo bg-light rounded-4 p-3 col-md-4">
                         <h4 class="card-title text-center bg-danger">User Profile</h4>
@@ -206,6 +208,23 @@
     </div>
 
     <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="../jq/jquery.js"></script>
+    <script>
+  $('#logout-button').on('click', function() {
+    $.ajax({
+      url: '/logout',
+      method: 'POST',
+      success: function(response) {
+        // Handle successful logout, such as redirecting the user to the login page
+        window.location.href = '/login';
+      },
+      error: function(error) {
+        // Handle error, such as displaying an error message to the user
+        console.log(error);
+      }
+    });
+  });
+</script>
 </body>
 
 </html>

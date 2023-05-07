@@ -1,22 +1,13 @@
-  
-  // const validateReferralNumber = async (referralNumber) => {
-  //   if (referralNumber !== '') {
-  //     const response = await fetch('/verifyreferral', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json'
-  //       },
-  //       body: JSON.stringify({
-  //         referralnumber: referralNumber
-  //       })
-  //     });
-  //     const data = await response.json();
-  //     if (!data.success) {
-  //       throw new Error('Invalid referral number');
-  //     }
-  //   }
-  // };
-  
+// const validateReferralCodeOnClient = async (referralCode) => {
+//   try {
+//     const response = await fetch(`/api/validate-referral-code?code=${referralCode}`);
+//     const data = await response.json();
+//     return data.valid; // assuming the response contains a 'valid' property
+//   } catch (error) {
+//     console.error(error);
+//     return false;
+//   }
+// };
 
  
  document.addEventListener('DOMContentLoaded', () => {
@@ -67,11 +58,11 @@
         const emailValue = email.value.trim();
         const passwordValue = password.value.trim();
         const password2Value = password2.value.trim();
-        // const otpValue = otp.value.trim();
+        const otpValue = otp.value.trim();
         const phoneValue = phone.value.trim();
         const referralNumberValue = referralnumber.value.trim();
       
-        try {
+         {
           if (usernameValue === '') {
             setError(username, 'Username is required');
           } else {
@@ -132,16 +123,22 @@
           //   } else {
           //     setError(otp, 'Invalid OTP');
           //   }
-          // }
-          
-      
-          // await validateReferralNumber(referralNumberValue);
-          // setSuccess(referralnumber);
-      
-        } 
-        catch (error) {
-          setError(referralnumber, error.message);
-        }
-        form.submit();
+          }
+        //   if (referralNumberValue !== '') {
+        //     // Call referral code validation function
+        //     const isValidReferralCode = await validateReferralCodeOnClient(referralNumberValue);
+        //     if (isValidReferralCode) {
+        //       setSuccess(referralnumber);
+        //     } else {
+        //       setError(referralnumber, 'Invalid referral code');
+        //     }
+        //   } else {
+        //     setSuccess(referralnumber);
+        //   }
+        // } 
+        // catch (error) {
+        //   setError(referralnumber, error.message);
+        // }
+        
       };
 });

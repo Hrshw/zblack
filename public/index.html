@@ -21,9 +21,10 @@
 </head>
 
 <body class="bg-dark">
+
   <section class="header">
-<div class="navbar position-absolute">
-  <nav class="navbar navbar-expand-lg navbar-dark" style="z-index: 2;">
+<div class="navbar position-absolute w-100">
+  <nav class="navbar navbar-expand-lg navbar-dark w-100" style="z-index: 2;">
     <div class="container-fluid nav-gap">
       <a class="navbar-brand" href="/"><img src="images/logo.png" alt="logo"></a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
@@ -33,7 +34,7 @@
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
           <a class="nav-link" href="/">Home</a>
-          <a class="nav-link" href="#">About</a>
+          <a class="nav-link" href="/about">About</a>
           <a class="nav-link " aria-current="page" href="/signUp">SignUp</a>
           <a class="nav-link" href="/login">LogIn</a>
           <a class="nav-link" href="/user">My Dashboard</a>
@@ -56,17 +57,17 @@
         <div class="carousel-inner">
           <div class="carousel-item active">
             <img src="images/sliders/home-4-slider-01.jpg" class="d-block w-100" alt="...">
-            <div class="carousel-caption d-none d-md-block">
+            <!-- <div class="carousel-caption d-none d-md-block">
               <h5>First slide label</h5>
               <p>Some representative placeholder content for the first slide.</p>
-            </div>
+            </div> -->
           </div>
           <div class="carousel-item">
             <img src="images/sliders/home-4-slider-02.jpg" class="d-block w-100" alt="...">
-            <div class="carousel-caption d-none d-md-block">
+            <!-- <div class="carousel-caption d-none d-md-block">
               <h5>Second slide label</h5>
               <p>Some representative placeholder content for the second slide.</p>
-            </div>
+            </div> -->
           </div>
           <!-- <div class="carousel-item">
           <img src="..." class="d-block w-100" alt="...">
@@ -103,37 +104,6 @@
           Most Effective Business Module We Have In 2023
         </h1>
         <p class="col-md-9">We have more than 10+ year exeperience in marketing business , we are make achevers in financial field who leave his life with financial freedom . in 2023 we start a new journey with you so let's start with us Thank You !</p>
-       
-      
-          <div class="row mt-5">
-              <div class="col-md-3">
-                  <div class="counter">
-                      <div class="counter-icon">
-                          <i class="fa fa-globe"></i>
-                      </div>
-                      <span class="counter-value">862</span>
-                      <h3>Web Designing</h3>
-                  </div>
-              </div>
-              <div class="col-md-3">
-                  <div class="counter blue">
-                      <div class="counter-icon">
-                          <i class="fa fa-rocket"></i>
-                      </div>
-                      <span class="counter-value">814</span>
-                      <h3>Web Development</h3>
-                  </div>
-              </div>
-              <div class="col-md-3">
-                <div class="counter blue">
-                    <div class="counter-icon">
-                        <i class="fa fa-rocket"></i>
-                    </div>
-                    <span class="counter-value">814</span>
-                    <h3>Web Development</h3>
-                </div>
-            </div>
-          </div>
             <button class="btn-dark bg-info mt-5 w-50 rounded-3"><a>Get Package</a></button>
       </div>
     </div>
@@ -232,7 +202,7 @@
           </div>
           <div class="col-xl-6 col-lg-6">
               <div class="strategy-img bg-light" data-wow-delay=".5s" data-wow-duration=".3" style="visibility: visible; animation-delay: 0.5s; animation-name: fadeInUp;">
-                  <img src="images/g.png" alt="">
+                  <img width="100%" src="images/g.png" alt="">
               </div>
           </div>
       </div>
@@ -268,22 +238,19 @@
                   <div class="pricing-content">
                       <p>Direct Revenue</p>
                       <p>Add View Revenue</p>
-                      <p>Level Add Revenue</p>
+                      <p>Down Revenue</p>
                   </div>
                   <div class="pricing-button active">
-                      <a class="btn btn-danger" id="checkout-button">choose plan <i class="far fa-long-arrow-right"></i></a>
+                      <a class="btn btn-danger" id="checkout-button">choose plan <i class="fa-solid fa-arrow-right"></i></a>
                   </div>
               </div>
           </div>
           <div class="col-xl-4 col-lg-4 col-md-6">
-              
+            <div class="alert d-none" role="alert" id="myAlert"></div>
           </div>
       </div>
   </div>
 </div>
-
-
-
 
 
 </section>
@@ -436,11 +403,50 @@
   <script src="../js/bootstrap.js"></script>
   <script>
 
+const myAlert = document.getElementById('myAlert');
 const checkoutButton = document.getElementById('checkout-button');
 
 checkoutButton.addEventListener('click', () => {
-  window.location.href = '/checkout.html';
+  // Check if the user is logged in
+  fetch('/user')
+    .then((response) => {
+      if (response.ok) {
+        // User is logged in, redirect to checkout page
+        fetch('/Login')
+          .then((isLoggedInResponse) => {
+            if (isLoggedInResponse.ok) {
+              window.location.href = '/checkout';
+            } else {
+              myAlert.innerHTML = 'You need to log in to make a purchase.';
+              myAlert.classList.add('alert-danger');
+              myAlert.classList.remove('d-none');
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+            myAlert.innerHTML = 'An error occurred while checking your login status.';
+            myAlert.classList.add('alert-danger');
+            myAlert.classList.remove('d-none');
+          });
+      } else {
+        // User is not logged in, redirect to login page
+        window.location.href = '/login';
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      myAlert.innerHTML = 'An error occurred while checking your login status.';
+      myAlert.classList.add('alert-danger');
+      myAlert.classList.remove('d-none');
+    });
+
+  setTimeout(() => {
+    myAlert.classList.add('d-none');
+  }, 3000);
 });
+
+
+
 
 
 $(window).scroll(function() {

@@ -1,13 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@1,300&family=Montserrat:wght@300&display=swap');
 body{
-    font-family: 'Lato', sans-serif;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Lato', sans-serif !important;
+    font-family: 'Montserrat', sans-serif !important;
 }
 .nav-link{
     transition: all 0.2s;
     position: relative;
     font-size: 1.5rem;
     color: aqua;
+}
+.navbar .nav-link {
+    font-size: 17px !important;
+    color: #FF6969 !important;
 }
 .navbar .nav-link:hover::after{
     content: " ";
@@ -187,4 +191,11 @@ input[type=number]::-webkit-outer-spin-button {
     color: #ff3860;
     font-size: 12px;
     height: 13px;
+}
+
+
+@media screen and (max-width:990px){
+    .navbar-brand img{
+        width:90px;
+    }
 }

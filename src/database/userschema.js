@@ -2,6 +2,25 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+const paymentSchema = new mongoose.Schema({
+    amount: {
+      type: Number,
+      required: true
+    },
+    currency: {
+      type: String,
+      required: true
+    },
+    paymentId: {
+      type: String,
+      required: true
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
+  });
+
 const userschema = new mongoose.Schema({
     username: {
         type: String,
@@ -60,22 +79,11 @@ const userschema = new mongoose.Schema({
         type: Number,
         default: 0
       },
-      payment: {
-        type: {
-          amount: Number,
-          currency: String,
-          paymentId: String
-        },
-        default: null
-      },
-      paymentStatus: {
-        type: String,
-        default: null
-      },
     createdAt: {
         type: Date,
         default: Date.now
     },
+    payments: [paymentSchema],
     tokens: [{
         token: {
             type: String,

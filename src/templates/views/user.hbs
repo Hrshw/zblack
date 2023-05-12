@@ -378,4 +378,46 @@
     <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
     <script src="../jq/jquery.js"></script>
     <script src="js/user.js"></script>
+    <script>
+        
+        const shareReferralLinkButtons = document.querySelectorAll('.shareReferralLinkButton');
+        const socialMediaIconsContainers = document.querySelectorAll('.socialMediaIconsContainer');
+        const socialMediaIcons = document.querySelectorAll('.socialMediaIcon');
+        const referralCode = "{{user.referralCode}}"; // Assuming user.referralCode contains the referral code
+        
+        const handleShareButtonClick = (socialMediaIconsContainer) => {
+          socialMediaIconsContainer.style.display = 'block';
+        };
+        
+        shareReferralLinkButtons.forEach((button, index) => {
+          button.addEventListener('click', () => {
+            handleShareButtonClick(socialMediaIconsContainers[index]);
+          });
+        });
+        
+        socialMediaIcons.forEach(icon => {
+          icon.addEventListener('click', () => {
+            const platform = icon.dataset.platform;
+            let shareLink;
+        
+            switch (platform) {
+              case 'Facebook':
+                shareLink = `https://www.facebook.com/sharer.php?u=${encodeURIComponent(`https://zblack.in/signUp?referral=${referralCode}`)}`;
+                break;
+              case 'Twitter':
+                shareLink = `https://twitter.com/intent/tweet?url=${encodeURIComponent(`https://zblack.in/signUp?referral=${referralCode}`)}`;
+                break;
+              case 'WhatsApp':
+                shareLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(`Join me on ZBlack and earn rewards! Sign up using my referral link: https://zblack.in/signUp?referral=${referralCode}`)}`;
+                break;
+              // Add more cases for other social media platforms if needed
+              default:
+                alert('Invalid platform. Please try again.');
+                return;
+            }
+        
+            window.open(shareLink);
+          });
+        });
+    </script>
 </body>

@@ -83,7 +83,14 @@ const userschema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    payments: [paymentSchema],
+    payments: [paymentSchema], // Use the defined paymentSchema for payments array
+    bankDetails: {
+      bankName: { type: String, default: null },
+      accountNumber: { type: String, default: null },
+      ifscCode: { type: String, default: null },
+      panCard: { type: String, default: null },
+      aadharCard: { type: String, default: null },
+    },
     tokens: [{
         token: {
             type: String,
@@ -122,5 +129,4 @@ userschema.pre("save", async function (next) {
 // create collection :-
 
 const Register = new mongoose.model("Register", userschema);
-
 module.exports = Register;

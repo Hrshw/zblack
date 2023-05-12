@@ -14,12 +14,11 @@ const { validationResult } = require('express-validator');
 const shortid = require('shortid');
 const { userRegistrationValidator } = require('./middleware/validate');
 const { validateReferralCode } = require('./middleware/checkReferrels');
-const handleReferral = require('./updatecoins');
+const handleReferral = require('./controllers/updatecoins');
+const { updateBankDetails } = require('./controllers/bankdetails');
 const session = require('express-session');
 const fast2sms = require('fast-two-sms');
 const speakeasy = require('speakeasy');
-// const otplib = require('otplib');
-// const secret = otplib.authenticator.generateSecret();
 const cors = require('cors')
 
 
@@ -121,7 +120,6 @@ app.post('/login', async (req, res) => {
 
 
 
-
 app.post('/logout', auth, async (req, res) => {
   try {
     if (!req.user) {
@@ -138,7 +136,7 @@ app.post('/logout', auth, async (req, res) => {
     // Clear the cookie
     res.clearCookie('jwt');
 
-    res.redirect('/login');
+    res.redirect('/');
   } catch (error) {
     console.log(error);
     res.status(500).send();
@@ -149,13 +147,22 @@ app.post('/logout', auth, async (req, res) => {
 
 app.get('/user', auth, async (req, res) => {
   try {
-    const user = await Register.findById(req.session.userId); // get the user data from the session
-    console.log(user);
+    const user = await Register.findById(req.session.userId)
+      .populate('referredUsers', 'coins referralCode') // populate referredUsers field with the coins and referralCode fields of referred users
+      .exec();
+
     if (!user) {
       return res.redirect('/login');
     }
+
+    // Calculate the coins for direct and indirect referred users
+    const directCoins = user.directReferredUsers * 20;
+    const indirectCoins = user.indirectReferredUsers * 10;
+
     const userCount = await getUserCount();
-    res.render('user', { user, userCount }); // render the user template and pass user data
+    const userLoggedIn = true; // Set userLoggedIn to true since the user is logged in
+
+    res.render('user', { user, userCount, directCoins, indirectCoins, userLoggedIn });
   } catch (error) {
     if (error.name === 'JsonWebTokenError') {
       return res.redirect('/login');
@@ -164,6 +171,8 @@ app.get('/user', auth, async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
+app.post('/user/updateBankDetails', auth, updateBankDetails);
+
 
 app.get('/signup', (req, res) => {
   res.render('signup');
@@ -192,11 +201,11 @@ app.post('/signup', validateReferralCode, userRegistrationValidator, urlencoded,
   const { username, email, phone, otp, password, confirmpassword, referredUsers } = req.body;
 
    // Verify OTP
-   const secret = process.env.SECRET_KEY;
-   const isOTPValid = speakeasy.totp.verify({ secret, token: otp, window: 5 * 60 });
-   if (!isOTPValid) {
-     return res.render('signup', { alert: [{ msg: 'Invalid OTP. Please enter a valid OTP.' }] });
-   }
+  //  const secret = process.env.SECRET_KEY;
+  //  const isOTPValid = speakeasy.totp.verify({ secret, token: otp, window: 5 * 60 });
+  //  if (!isOTPValid) {
+  //    return res.render('signup', { alert: [{ msg: 'Invalid OTP. Please enter a valid OTP.' }] });
+  //  }
   const referredBy = req.referrer ? req.referrer.referralCode : null;
   const registeruser = new Register({
     username,
@@ -282,6 +291,21 @@ app.post('/sendotp', async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to send OTP' });
   }
 });
+app.get('/validate-otp/:otp', (req, res) => {
+  const { otp } = req.params; // access the otp value from req.params
+  const secret = process.env.SECRET_KEY;
+  const isOTPValid = speakeasy.totp.verify({ secret, token: otp, window: 5 * 60 });
+
+  if (isOTPValid) {
+    // OTP is valid, perform further actions
+    return res.status(200).send({ isValidOTP: true });
+  } else {
+    // OTP is not valid
+    return res.status(400).send({ isValidOTP: false, error: 'Invalid OTP. Please enter a valid OTP.' });
+  }
+});
+
+
 
 
 app.get('/check-existing', async (req, res) => {
@@ -309,7 +333,43 @@ app.get('/check-existing', async (req, res) => {
   return res.status(200).json({ message: 'No user found with this username, email, or phone number' });
 });
 
+// Withdraw Router
+app.post('/withdraw', async (req, res) => {
+  try {
+    const { bankName, accountNumber, amount } = req.body;
+    const user = await Register.findById(req.user._id);
+    const bank = await Bank.findOne({ name: bankName });
+    if (!bank) {
+      return res.status(400).json({ message: "Bank not found" });
+    }
+    if (user.coins < amount) {
+      return res.status(400).json({ message: "Insufficient balance" });
+    }
+    // Deduct amount from user's coins
+    user.coins -= amount;
+    await user.save();
+    // Update bank's balance
+    bank.balance += amount;
+    await bank.save();
+    return res.json({ message: "Withdrawal successful" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
 
+// checkreferralcode
+app.get('/check-referral-code/:referralCode', async (req, res) => {
+  const referralCode = req.params.referralCode;
+
+  const referrer = await Register.findOne({ referralCode: referralCode });
+
+  if (referrer) {
+    res.status(200).json({ isValidReferralCode: true });
+  } else {
+    res.status(400).json({ isValidReferralCode: false, message: 'Invalid referral code' });
+  }
+});
 
 
 // Start server

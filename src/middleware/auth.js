@@ -7,7 +7,7 @@ const auth = async (req, res, next) => {
         if (!token) {
             return res.redirect("/login");
         }
-        const verifyUser = jwt.verify(token, process.env.SECRET_KEY);
+        const verifyUser = await jwt.verify(token, process.env.SECRET_KEY);
         const user = await Register.findOne({ _id: verifyUser._id });
         if (!user) {
             return res.redirect("/login");

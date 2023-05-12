@@ -32,6 +32,15 @@ exports.userRegistrationValidator = [
       }
       return true;
     }),
+    body('referralCode')
+    .not().isEmpty().withMessage('Referral code is required')
+    .custom(async (value) => {
+      const referrer = await User.findOne({ referralCode: value });
+      if (!referrer) {
+        throw new Error('Invalid referral code');
+      }
+      return true;
+    }),
   body('otp').not().isEmpty().withMessage('OTP is required')
     .isNumeric().withMessage('OTP should be numeric')
     .isLength({ min: 6, max: 6 }).withMessage('OTP should be 6 digits long'),
@@ -57,3 +66,4 @@ exports.userRegistrationValidator = [
     next();
   }
 ];
+

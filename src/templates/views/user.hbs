@@ -11,8 +11,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
         integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-    {{!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css"
-        integrity="sha384-b6lVK+yci+bfDmaY1u0zE8YYJt0TZxLEAFyYSLHId4xoVvsrQu3INevFKo+Xir8e" crossorigin="anonymous"> --}}
+
+    {{!--
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css"
+        integrity="sha384-b6lVK+yci+bfDmaY1u0zE8YYJt0TZxLEAFyYSLHId4xoVvsrQu3INevFKo+Xir8e" crossorigin="anonymous">
+    --}}
+
 </head>
 
 <body class="bg-dark">
@@ -22,15 +26,15 @@
             <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
                 <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
                     <a class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-                        <span class="fs-5 d-none d-sm-inline">Menu</span>
+                        <span class="d-sm-inline menuText">Menu</span>
                     </a>
-                    <p class="text-danger">{{user.sponsorId}}</p>
-                    <p class="text-danger">{{user.referralCode}}</p>
+                    <p class="text-danger userID">{{user.sponsorId}}</p>
+                    <p class="text-danger userID">{{user.referralCode}}</p>
                     <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start"
                         id="menu">
-                        <li class="nav-item">
-                            <a href="#" class="nav-link align-middle px-0">
-                                <i class="fs-4 bi-house"></i> <span class="ms-1 d-none d-sm-inline">Home</span>
+                        <li class="nav-item userHomeButton">
+                            <a class=" nav-link align-middle px-0">
+                                <i class="fs-4 bi-house"></i> <span class="ms-1 d-sm-inline">Home</span>
                             </a>
                         </li>
                         <li>
@@ -39,7 +43,7 @@
                                     class="ms-1 d-none d-sm-inline">Dashboard</span> </a>
                             <ul class="collapse show nav flex-column ms-1" id="submenu" data-bs-parent="#menu">
                                 <li class="w-100">
-                                    <a class="nav-link px-0"> <span class="d-none d-sm-inline">
+                                    <a class="nav-link px-0"> <span class="d-sm-inline">
                                             <p class="text-danger">{{user.username}}</p>
                                         </span> </a>
                                 </li>
@@ -49,182 +53,329 @@
                             </ul>
                         </li>
                         <li>
-                            <a href="#submenu1" data-bs-toggle="collapse" class="nav-link px-0 align-middle ">
-                                <i class="fs-4 bi-bootstrap"></i> <span class="ms-1 d-none d-sm-inline">Team
-                                    info</span></a>
-                            <ul class="collapse nav flex-column ms-1" id="submenu1" data-bs-parent="#menu">
-                                <li class="w-100">
-                                    <a href="#" class="nav-link px-0"> <span class="d-none d-sm-inline">Item</span>
-                                        1</a>
-                                </li>
-                                <li>
-                                    <a href="#" class="nav-link px-0"> <span class="d-none d-sm-inline">Item</span>
-                                        2</a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
                             <a href="#submenu2" data-bs-toggle="collapse" class="nav-link px-0 align-middle ">
-                                <i class="fs-4 bi-bootstrap"></i> <span class="ms-1 d-none d-sm-inline">My
+                                <i class="fs-4 bi-bootstrap"></i> <span class="ms-1 d-sm-inline">My
                                     Revenue</span></a>
                             <ul class="collapse nav flex-column ms-1" id="submenu2" data-bs-parent="#menu">
                                 <li class="w-100">
-                                    <a href="#" class="nav-link px-0"> <span class="d-none d-sm-inline">Item</span>
-                                        1</a>
+                                    <p class="px-0"> <span class="d-sm-inline bg-info p-2 rounded-1">Direct Bonus
+                                            :</span>
+                                        {{ directCoins }}🪙 </p>
                                 </li>
                                 <li>
-                                    <a href="#" class="nav-link px-0"> <span class="d-none d-sm-inline">Item</span>
-                                        2</a>
+                                    <p class="px-0"> <span class="d-sm-inline bg-info p-2 rounded-1">Down Bonus
+                                            :</span>
+                                        {{ indirectCoins }}🪙 </p>
                                 </li>
                             </ul>
                         </li>
                         <li>
                             <a href="#submenu3" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
-                                <i class="fs-4 bi-grid"></i> <span class="ms-1 d-none d-sm-inline">User info</span> </a>
+                                <i class="fs-4 bi-grid"></i> <span class="ms-1 d-sm-inline">User info</span> </a>
                             <ul class="collapse nav flex-column ms-1" id="submenu3" data-bs-parent="#menu">
-                                <li class="w-100">
-                                    <a href="#" class="nav-link px-0"> <span class="d-none d-sm-inline">Product</span>
-                                        1</a>
+                                <li class="bankDetailButton">
+                                    <a class="nav-link px-0"> <span class="d-sm-inline text-info">Bankdetail
+                                            Form</span>
+                                    </a>
                                 </li>
-                                <li>
-                                    <a href="#" class="nav-link px-0"> <span class="d-none d-sm-inline">Product</span>
-                                        2</a>
-                                </li>
-                                <li>
-                                    <a href="#" class="nav-link px-0"> <span class="d-none d-sm-inline">Product</span>
-                                        3</a>
-                                </li>
-                                <li>
-                                    <a href="#" class="nav-link px-0"> <span class="d-none d-sm-inline">Product</span>
-                                        4</a>
+                                <li class="showDetailButton">
+                                    <a class="nav-link px-0"> <span class="d-sm-inline text-info">Your
+                                            Details</span>
+                                    </a>
                                 </li>
                             </ul>
                         </li>
-                        <!-- <li>
-                        <a href="#submenu4" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
-                            <i class="fs-4 bi-grid"></i> <span class="ms-1 d-none d-sm-inline">User info</span> </a>
+                        <li>
+                            <a href="#submenu4" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
+                                <i class="fs-4 bi-grid"></i> <span class="ms-1 d-sm-inline"></span> withdrawal</a>
                             <ul class="collapse nav flex-column ms-1" id="submenu4" data-bs-parent="#menu">
-                            <li class="w-100">
-                                <a href="#" class="nav-link px-0"> <span class="d-none d-sm-inline">Product</span> 1</a>
-                            </li>
-                            <li>
-                                <a href="#" class="nav-link px-0"> <span class="d-none d-sm-inline">Product</span> 2</a>
-                            </li>
-                        </ul>
-                    </li> -->
+                                <li class="withdrawalFormButton">
+                                    <a class="nav-link px-0"> <span class="d-sm-inline text-info">Withdrawal
+                                            Money</span>
+                                    </a>
+                                </li>
+                                <li class="withdrawalHistoryButton">
+                                    <a class="nav-link px-0"> <span class="d-sm-inline text-info">Withdrawal
+                                            History</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
                         <li>
                             <a href="#submenu5" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
-                                <i class="fs-4 bi-grid"></i> <span class="ms-1 d-none d-sm-inline">Support</span> </a>
+                                <i class="fs-4 bi-grid"></i> <span class="ms-1 d-sm-inline"></span> Support</a>
                             <ul class="collapse nav flex-column ms-1" id="submenu5" data-bs-parent="#menu">
-                                <li class="w-100">
-                                    <a href="#" class="nav-link px-0"> <span class="d-none d-sm-inline">Product</span>
-                                        1</a>
-                                </li>
-                                <li>
-                                    <a href="#" class="nav-link px-0"> <span class="d-none d-sm-inline">Product</span>
-                                        2</a>
+                                <li class="contactUsButton">
+                                    <a href="#" class="nav-link px-0"> <span class="d-sm-inline text-info">Contact
+                                            Us</span>
+                                    </a>
                                 </li>
                             </ul>
-                        </li>
-                        <li>
-                            <a href="#" class="nav-link px-0 align-middle">
-                                <i class="fs-4 bi-people"></i> <span class="ms-1 d-none d-sm-inline">Customers</span>
-                            </a>
                         </li>
                     </ul>
                     <hr>
                     <div class="dropdown pb-4">
                         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
                             id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="https://github.com/mdo.png" alt="hugenerd" width="30" height="30"
-                                class="rounded-circle">
+                            {{!-- <img src="https://github.com/mdo.png" alt="hugenerd" width="30" height="30"
+                                class="rounded-circle"> --}}
                             <span class="d-none d-sm-inline mx-1">User</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-                            <li><a class="dropdown-item" href="#">New project...</a></li>
-                            <li><a class="dropdown-item" href="#">Settings</a></li>
                             <li><a class="dropdown-item" href="#">Profile</a></li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" id="logout-button">Logout</a></li>
+                            <li><a href="#" class="dropdown-item" id="logout-button">Logout</a></li>
                         </ul>
                     </div>
                 </div>
             </div>
 
             <div class="col py-3 mt-5">
-                <div class="bg-info mb-5 text-center rounded"><p class="text-light fs-2">Please make pataince we will woking on it, to give you best services. 😊</p></div>
-                <div class="userSection row justify-content-evenly">
-                    <div class="userInfo bg-light rounded-4 p-3 col-md-4">
-                        <h4 class="card-title text-center bg-danger">User Profile</h4>
-                        <hr>
-                        <h6 class="">User Name: <span class="text-info m-1 text-dark">{{user.username}}</span></h6>
-                        <h6 class="">Mobile: <span class="text-info m-1">{{user.phone}}</span></h6>
-                        <h6 class="">Referral Code: <span class="text-info m-1">{{user.referralCode}}</span></h6>
-                        <h6 class="">Sponsor ID: <span class="text-info m-1">{{user.sponsorId}}</span></h6>
+
+                <div class="userSection">
+                    <div class="bg-info mb-5 text-center rounded">
+                        <p class="text-light fs-2">Thank you for your patience as we work diligently to provide you with
+                            exceptional service. 😊</p>
                     </div>
-                    <div class="balance bg-light rounded-4 p-2 col-md-4 mt-4 mt-md-0">
-                        <p class=" text-danger fs-3">{{user.coins}}</p>
-                        <p class=" fs-4">Available Balance</p>
+                    <div class="row justify-content-evenly">
+                        <div class="userInfo bg-light rounded-4 p-3 col-md-4">
+                            <h4 class="card-title text-center text-info fs-3">User Profile</h4>
+                            <hr>
+                            <h6 class="">User Name: <span class="text-info m-1 text-danger text-uppercase">{{user.username}}</span>
+                            </h6>
+                            <h6 class="">Mobile: <span class="text-info m-1">{{user.phone}}</span></h6>
+                            <h6 class="">Referral Code: <span class="text-info m-1">{{user.referralCode}}</span></h6>
+                            <h6 class="">Sponsor ID: <span class="text-info m-1">{{user.sponsorId}}</span></h6>
+                            <button class="shareReferralLinkButton btn btn-danger">Share your referral Link</button>
+                            <div class="socialMediaIconsContainer" style="display: none;">
+                                <img src="images/icons/meta.svg" alt="Facebook" data-platform="Facebook"
+                                    class="socialMediaIcon">
+                                <img src="images/icons/square-twitter.svg" alt="Twitter" data-platform="Twitter"
+                                    class="socialMediaIcon">
+                                <img src="images/icons/whatsapp.svg" alt="WhatsApp" data-platform="WhatsApp"
+                                    class="socialMediaIcon">
+                                <!-- Add more social media icons as needed -->
+                            </div>
+                        </div>
+                        <div class="balance bg-light rounded-4 p-2 col-md-4 mt-4 mt-md-0">
+                            <p class=" text-danger fs-3">{{user.coins}}</p>
+                            <p class=" fs-4">Available Balance</p>
+                        </div>
+                        <div class="withdrawal bg-light rounded-4 p-2 col-md-2 mt-4 mt-md-0">
+                            <p class="text-danger fs-3">
+                                {{user.coins}}
+                            </p>
+                            <p class=" fs-4">Total Revenue</p>
+                        </div>
                     </div>
-                    <div class="withdrawal bg-light rounded-4 p-2 col-md-2 mt-4 mt-md-0">
-                        <p class="text-danger fs-3">
-                            {{user.coins}}
-                        </p>
-                        <p class=" fs-4">Total Revenue</p>
+                    <div class="row mt-5 justify-content-evenly">
+                        <div class="withdrawal bg-light rounded-4 p-2 col-md-2 mt-4 mt-md-0">
+                            <p class="text-danger fs-3">0</p>
+                            <p class=" fs-4">Total Withdrawal</p>
+                        </div>
+                        <div class="withdrawal bg-light rounded-4 p-2 col-md-2 mt-4 mt-md-0">
+                            <p class="text-danger fs-3">
+                                {{user.directReferredUsers}}
+                            </p>
+                            <p class=" fs-4">My Direct Team</p>
+                        </div>
+                        <div class="withdrawal bg-light rounded-4 p-2 col-md-2 mt-4 mt-md-0">
+                            <p class="text-danger fs-3"> <span class="number">
+                                    {{user.indirectReferredUsers}}
+                                </span>
+                            </p>
+                            <p class=" fs-4">My Down Team</p>
+                        </div>
+                        <div class="withdrawal bg-light rounded-4 p-2 col-md-2 mt-4 mt-md-0">
+                            <p class="text-danger fs-3">
+                                {{userCount}}
+                            </p>
+                            <p class=" fs-4">Company Team</p>
+                        </div>
                     </div>
                 </div>
-                <div class="row mt-5 justify-content-evenly">
-                    <div class="withdrawal bg-light rounded-4 p-2 col-md-2 mt-4 mt-md-0">
-                        <p class="text-danger fs-3">0</p>
-                        <p class=" fs-4">Total Withdrawal</p>
-                    </div>
-                    <div class="withdrawal bg-light rounded-4 p-2 col-md-2 mt-4 mt-md-0">
-                        <p class="text-danger fs-3">
-                            {{user.directReferredUsers}}
-                        </p>
-                        <p class=" fs-4">My Direct Team</p>
-                    </div>
-                    <div class="withdrawal bg-light rounded-4 p-2 col-md-2 mt-4 mt-md-0">
-                        <p class="text-danger fs-3"> <span class="number">
-                                {{user.indirectReferredUsers}}
-                            </span>
-                        </p>
-                        <p class=" fs-4">My Down Team</p>
-                    </div>
-                    <div class="withdrawal bg-light rounded-4 p-2 col-md-2 mt-4 mt-md-0">
-                        <p class="text-danger fs-3">
-                            {{userCount}}
-                        </p>
-                        <p class=" fs-4">Company Team</p>
-                    </div>
-                    <!-- <div class="withdrawal bg-light rounded-4 p-3 col-md-2 mt-8 mt-md-0">
-                        Number of referred users:
-                    </div> -->
+
+                <div class="bankDetailsSection rounded-3 p-3 ml-3 d-grid justify-content-center d-none"
+                    style="background-color:darkseagreen;">
+                    <h3 class="text-center">Fill Your Bank Details:</h3>
+                    <div id="successMessage" class="message success" style="display: none;color: green;"></div>
+                    <div id="errorMessage" class="message error" style="display: none;color: red;"></div>
+                    <form class="mt-4" action="/user/updateBankDetails" method="POST" id="form">
+                        <div class="form-group text-light">
+                            <label for="bankName">Bank Name:</label>
+                            <input type="text" class="form-control" id="bankName" name="bankName">
+                            <div class="error text-danger"></div>
+                        </div>
+
+                        <div class="form-group text-light">
+                            <label for="accountNumber">Account Number:</label>
+                            <input type="text" class="form-control" id="accountNumber" name="accountNumber">
+                            <div class="error text-danger"></div>
+                        </div>
+                        <div class="form-group text-light">
+                            <label for="accountNumberVerification">Verify Account Number:</label>
+                            <input type="text" class="form-control" id="accountNumberVerification" name="accountNumberVerification">
+                            <div class="error text-danger"></div>
+                        </div>
+
+                        <div class="form-group text-light">
+                            <label for="ifscCode">IFSC Code:</label>
+                            <input type="text" class="form-control" id="ifscCode" name="ifscCode">
+                            <div class="error text-danger"></div>
+                        </div>
+
+                        <div class="form-group text-light mt-2">
+                            <p>Choose one of the following:</p>
+                            <div class="form-check text-light mb-0">
+                                <input class="form-check-input" type="radio" name="cardType" id="panCard"
+                                    value="panCard">
+                                <label class="form-check-label" for="panCard">
+                                    Pan Card
+                                </label>
+                                <div class="error text-danger"></div>
+                            </div>
+                            <div class="form-check text-light">
+                                <input class="form-check-input" type="radio" name="cardType" id="aadharCard"
+                                    value="aadharCard">
+                                <label class="form-check-label" for="aadharCard">
+                                    Aadhar Card
+                                </label>
+                                <div class="error text-danger"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group text-light">
+                            <label for="cardNumber">Card Number:</label>
+                            <div class="error text-danger"></div>
+                            <input type="text" class="form-control" id="cardNumber" name="cardNumber">
+                        </div>
+
+                        <div id="message"></div>
+                        <button type="submit" class="btn btn-primary mt-3">Submit</button>
+                    </form>
                 </div>
+
+                <div class="showDetailsSection d-none p-4 rounded-4" style="background-color: darkseagreen;">
+
+                    {{#if user.bankDetails.bankName}}
+                    <h3 class="ms-4 mb-4 text-white">Your Name: <span class="text-uppercase" style="color: rgb(0, 253, 236);">{{ user.username }}</span>
+                    </h3>
+                    <h3 class="ms-4 mb-4 text-white">Bank Name: <span class="text-uppercase" style="color: rgb(0, 253, 236);">{{ user.bankDetails.bankName }}</span>
+                    </h3>
+                    <h3 class="ms-4 mb-4 text-white">Account Number: <span style="color: rgb(0, 253, 236);">{{ user.bankDetails.accountNumber
+                            }}</span></h3>
+                    <h3 class="ms-4 mb-4 text-white">IFSC Code: <span class=" text-uppercase" style="color: rgb(0, 253, 236);">{{ user.bankDetails.ifscCode }}</span>
+                    </h3>
+                    {{#if user.bankDetails.panCard}}
+                    <h3 class="ms-4 mb-4 text-white">PAN Card: <span class=" text-uppercase" style="color: rgb(0, 253, 236);">{{ user.bankDetails.panCard }}</span></h3>
+                    {{/if}}
+
+                    {{#if user.bankDetails.aadharCard}}
+                    <h3 class="ms-4 mb-4 text-white">Aadhar Card: <span class=" text-uppercase" style="color: rgb(0, 253, 236);">{{ user.bankDetails.aadharCard }}</span>
+                    </h3>
+                    {{/if}}
+                    <h3 class="ms-4 mb-4 text-white">Your ReferralCode: <span class="text-uppercase" style="color: rgb(0, 253, 236);">{{ user.referralCode }}</span>
+                    </h3>
+                     <button class="shareReferralLinkButton btn btn-danger text-center">Share your referral Link</button>
+                            <div class="socialMediaIconsContainer" style="display: none;">
+                                <img src="images/icons/meta.svg" alt="Facebook" data-platform="Facebook"
+                                    class="socialMediaIcon">
+                                <img src="images/icons/square-twitter.svg" alt="Twitter" data-platform="Twitter"
+                                    class="socialMediaIcon">
+                                <img src="images/icons/whatsapp.svg" alt="WhatsApp" data-platform="WhatsApp"
+                                    class="socialMediaIcon">
+                                <!-- Add more social media icons as needed -->
+                            </div>
+                    {{else}}
+                    <p class="text-white fs-4">Please fill in your bank details.</p>
+                    {{!-- <button id="fillBankDetailsButton">Fill Bank Details</button> --}}
+                    {{/if}}
+                </div>
+
+
+                <div class="withdrawalSection d-none rounded-3 p-3 ml-3 d-grid justify-content-center"
+                    style="background-color:darkseagreen;">
+
+                    <h1 class=" text-light"> <span class=" text-info">Exciting news!</span>
+                        We're currently revamping the withdrawal section to make it even better for you.
+                        Please bear with us as we work behind the scenes to enhance your experience. Stay tuned for the
+                        upgraded version!</h1>
+                    {{!-- <h3 class="text-center">Fill Your Bank Details:</h3>
+                    <form class="mt-4" action="/user/updateBankDetails" method="POST" id="form">
+                        <div class="form-group text-light">
+                            <label for="bankName">Bank Name:</label>
+                            <input type="text" class="form-control" id="bankName" name="bankName">
+                            <div class="error text-danger"></div>
+                        </div>
+
+                        <div class="form-group text-light">
+                            <label for="accountNumber">Account Number:</label>
+                            <input type="text" class="form-control" id="accountNumber" name="accountNumber">
+                            <div class="error text-danger"></div>
+                        </div>
+
+                        <div class="form-group text-light">
+                            <label for="ifscCode">IFSC Code:</label>
+                            <input type="text" class="form-control" id="ifscCode" name="ifscCode">
+                            <div class="error text-danger"></div>
+                        </div>
+
+                        <div class="form-group text-light mt-2">
+                            <p>Choose one of the following:</p>
+                            <div class="form-check text-light mb-0">
+                                <input class="form-check-input" type="radio" name="cardType" id="panCard"
+                                    value="panCard">
+                                <label class="form-check-label" for="panCard">
+                                    Pan Card
+                                </label>
+                                <div class="error text-danger"></div>
+                            </div>
+                            <div class="form-check text-light">
+                                <input class="form-check-input" type="radio" name="cardType" id="aadharCard"
+                                    value="aadharCard">
+                                <label class="form-check-label" for="aadharCard">
+                                    Aadhar Card
+                                </label>
+                                <div class="error text-danger"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group text-light">
+                            <label for="cardNumber">Card Number:</label>
+                            <div class="error text-danger"></div>
+                            <input type="text" class="form-control" id="cardNumber" name="cardNumber">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary mt-3">Submit</button>
+                    </form> --}}
+                </div>
+
+
+                <div class="withdrawalhistorySection d-none rounded-3 p-3 ml-3 d-grid justify-content-center"
+                    style="background-color:darkseagreen;">
+
+                    <h1 class=" text-light"> <span class=" text-info">Exciting news!</span>
+                        We're currently revamping the withdrawal section to make it even better for you.
+                        Please bear with us as we work behind the scenes to enhance your experience. Stay tuned for the
+                        upgraded version!</h1>
+                </div>
+
+                <div class="contactUsSection d-none rounded-3 p-3 ml-3 d-grid justify-content-center"
+                    style="background-color:darkseagreen;">
+                    <h3 class="text-center fs-2">Contact Us <span class=" text-danger">:</span></h3>
+                    <p class="fs-3 text-white">If you have any inquiries or if there's anything on your mind, please don't hesitate to reach out to us via email. We are here to assist you and address any questions or concerns you may have. Your feedback and queries are valuable to us, and we'll be more than happy to help you in any way we can. Drop us a line, and let's embark on this journey together! : <a class=" text-decoration-none fs-4 btn btn-danger" href="mailto:zblack9521@gmail.com" style="color: rgb(0, 253, 236);">email us</a></p>
+                    
+                       
+
+                </div>
+
             </div>
         </div>
     </div>
 
     <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
     <script src="../jq/jquery.js"></script>
-    <script>
-  $('#logout-button').on('click', function() {
-    $.ajax({
-      url: '/logout',
-      method: 'POST',
-      success: function(response) {
-        // Handle successful logout, such as redirecting the user to the login page
-        window.location.href = '/login';
-      },
-      error: function(error) {
-        // Handle error, such as displaying an error message to the user
-        console.log(error);
-      }
-    });
-  });
-</script>
+    <script src="js/user.js"></script>
 </body>
-
-</html>

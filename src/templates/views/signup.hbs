@@ -31,15 +31,6 @@
 
   <div class="container signupForm justify-content-center align-content-center w-50 bg-transparent text-white">
     <form class="row g-3" action="/signup" method="post" id="form" novalidate>
-      {{#if alert}}
-      <div class="alert alert-danger" role="alert">
-        <ul>
-          {{#each alert}}
-          <li>{{this.msg}}</li>
-          {{/each}}
-        </ul>
-      </div>
-      {{/if}}
       <div class="input-control">
         <label for="username" class="form-label">User Name</label>
         <input type="text" name="username" class="form-control" id="username"
@@ -99,5 +90,3 @@
   <script src="../js/bootstrap.js"></script>
   <script src="/js/signup.js"></script>
 </body>
-
-</html>

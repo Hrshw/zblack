@@ -193,9 +193,147 @@ input[type=number]::-webkit-outer-spin-button {
     height: 13px;
 }
 
+.socialMediaIcon{
+    width: 40px;
+    margin: 8px;
+    border: 2px solid red;
+    border-radius: 10px;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.bankDetailsButton,
+.contactUsButton,
+.withdrawalHistoryButton,
+.withdrawalFormButton,
+.showDetailButton,
+.bankDetailButton {
+    /* Add your other button styles here */
+    border-bottom: 2px solid transparent;
+    background-image: linear-gradient(to top, #b9542f, transparent);
+    background-position: bottom;
+    background-repeat: no-repeat;
+    background-size: 100% 0%;
+    transition: background-size 1.5s;
+}
+
+.bankDetailsButton:hover,
+.contactUsButton:hover,
+.withdrawalHistoryButton:hover,
+.withdrawalFormButton:hover,
+.showDetailButton:hover,
+.bankDetailButton:hover {
+    background-size: 100% 80%;
+    cursor: pointer;
+}
+
+
 
 @media screen and (max-width:990px){
     .navbar-brand img{
         width:90px;
     }
 }
+
+
+/* For Desktop View */
+@media screen and (min-width: 1024px) {
+    .bankDetails{
+        width: 80%;
+    }
+    #menu, .menuText, .userID{
+        font-size: 19px !important;
+    }
+    .bankDetails{
+        margin-left:70px;
+    }
+}
+
+/* For Tablet View */
+@media screen and (min-device-width: 768px)
+	and (max-device-width: 1024px) {
+        .bankDetails{
+            width: 80%;
+        }
+        .bankDetailsButton, 
+        .contactUsButton, 
+        .withdrawalHistoryButton, 
+        .withdrawalFormButton, 
+        .showDetailButton, 
+        .bankDetailButton a{
+            font-size: 10px;
+        }
+}
+
+/* For Mobile Portrait View */
+@media screen and (max-device-width: 480px)
+	and (orientation: portrait) {
+	#menu, .menuText, .userID{
+        font-size: 12px !important;
+    }
+    .bankDetails{
+        width: 100%;
+        margin: 0;
+    }
+    .bankDetailsButton, 
+    .contactUsButton, 
+    .withdrawalHistoryButton, 
+    .withdrawalFormButton, 
+    .showDetailButton, 
+    .bankDetailButton a{
+        font-size: 10px;
+    }
+}
+
+/* For Mobile Landscape View */
+@media screen and (max-device-width: 640px)
+	and (orientation: landscape) {
+        .bankDetailsButton, 
+        .contactUsButton, 
+        .withdrawalHistoryButton, 
+        .withdrawalFormButton, 
+        .showDetailButton, 
+        .bankDetailButton a{
+            font-size: 10px;
+        }
+}
+
+/* For Mobile Phones Portrait or Landscape View */
+@media screen
+	and (max-device-width: 640px) {
+        .bankDetailsButton, 
+        .contactUsButton, 
+        .withdrawalHistoryButton, 
+        .withdrawalFormButton, 
+        .showDetailButton, 
+        .bankDetailButton a{
+            font-size: 10px;
+        }
+}
+
+/* For iPhone 4 Portrait or Landscape View */
+@media screen and (min-device-width: 320px)
+	and (-webkit-min-device-pixel-ratio: 2) {
+        .bankDetailsButton, 
+        .contactUsButton, 
+        .withdrawalHistoryButton, 
+        .withdrawalFormButton, 
+        .showDetailButton, 
+        .bankDetailButton a{
+            font-size: 10px;
+        }
+}
+
+/* For iPhone 5 Portrait or Landscape View */
+@media (device-height: 568px)
+	and (device-width: 320px)
+	and (-webkit-min-device-pixel-ratio: 2) {
+
+}
+
+/* For iPhone 6 and 6 plus Portrait or Landscape View */
+@media (min-device-height: 667px)
+	and (min-device-width: 375px)
+	and (-webkit-min-device-pixel-ratio: 3) {
+	
+};

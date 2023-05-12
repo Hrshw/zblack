@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const password = document.getElementById('password');
   const phone = document.getElementById('phone')
   const password2 = document.getElementById('confirmpassword');
+  const referralCode = document.getElementById('referralnumber');
+  const otp = document.getElementById('otp')
 
   form.addEventListener('submit', e => {
     e.preventDefault();
@@ -45,6 +47,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const passwordValue = password.value.trim();
     const password2Value = password2.value.trim();
     const phoneValue = phone.value.trim();
+    const referralCodeValue = referralCode.value.trim();
+    const otpValue = otp.value.trim();
 
     if (usernameValue === '') {
       setError(username, 'Username is required');
@@ -84,12 +88,42 @@ document.addEventListener('DOMContentLoaded', () => {
       setSuccess(password2);
     }
 
+    if (referralCodeValue === '') {
+      setError(referralCode, 'Referral code is required');
+    } else {
+      const response = await fetch(`/check-referral-code/${referralCodeValue}`);
+      const data = await response.json();
+  
+      if (response.ok && data.isValidReferralCode) {
+        setSuccess(referralCode);
+      } else {
+        setError(referralCode, data.referralCodeErrorMessage);
+      }
+    }
+    if (otpValue === '') {
+      setError(otp, 'OTP is required');
+    } else if (otpValue.length !== 6) {
+      setError(otp, 'OTP must be 6 digits');
+    } else {
+      setSuccess(otp);
+  
+      const response = await fetch(`/validate-otp/${otpValue}`);
+      const data = await response.json();
+  
+      if (response.ok && data.isValidOTP) {
+        // OTP validation successful, submit the form
+        form.submit();
+      } else {
+        // OTP validation failed, show error message
+        setError(otp, 'Invalid OTP');
+      }
+    }
+
     const response = await fetch(`/check-existing?username=${usernameValue}&email=${emailValue}&phone=${phoneValue}`);
     const data = await response.json();
 
     if (response.ok) {
       // No user found with this username, email, or phone number
-      form.submit();
     } else {
       // Show error messages for each field that already exists
       const errors = data.errors;
@@ -103,5 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setError(phone, errors.phone);
       }
     } 
+
+  
   };
 });

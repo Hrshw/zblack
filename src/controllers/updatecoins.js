@@ -1,6 +1,4 @@
-const Register = require('./database/userschema');
-
-
+const Register = require('../database/userschema');
 
 
 const handleReferral = async (referralCode, referredBy) => {
@@ -35,7 +33,7 @@ const handleReferral = async (referralCode, referredBy) => {
 
     // Update sponsor user's coins
     const minusTeen = 10;
-    sponsorUser.coins += 20 - 10;
+    sponsorUser.coins += 20 - minusTeen;
     await Register.updateOne({ referralCode: referredBy }, { $set: { coins: sponsorUser.coins } });
 
 
@@ -52,37 +50,33 @@ if (referredUserReferrals > 0) {
     sponsor.coins += 10;
     sponsor.directReferredUsers += 1; // increment direct referred users
     await Register.updateOne({ referralCode: sponsor.referralCode }, { $set: { coins: sponsor.coins, directReferredUsers: sponsor.directReferredUsers } });
+
+    // Update indirect referred user count of sponsor
+    const updateIndirectReferredUsers = async (sponsor) => {
+      const grandSponsor = await Register.findOne({ referralCode: sponsor.referredBy });
+      if (grandSponsor) {
+        grandSponsor.indirectReferredUsers += 1; // increment indirect referred users
+        await Register.updateOne({ referralCode: sponsor.referredBy }, { $set: { indirectReferredUsers: grandSponsor.indirectReferredUsers } });
+        await updateIndirectReferredUsers(grandSponsor); // recursively update indirect referred users count
+      }
+    };
+    await updateIndirectReferredUsers(sponsor);
   });
-
- // Update indirect referred user count of sponsor
- const sponsorReferralCode = sponsorUser.referralCode;
- const grandSponsor = await Register.findOne({ referralCode: sponsorUser.referredBy });
- if (grandSponsor) {
-   grandSponsor.indirectReferredUsers += 1; // increment indirect referred users
-   await Register.updateOne({ referralCode: sponsorUser.referredBy }, { $set: { indirectReferredUsers: grandSponsor.indirectReferredUsers } });
- }
-
- // Update indirect referred user count of referral sponsors
- referralSponsors.forEach(async (sponsor) => {
-   const sponsorReferralCode = sponsor.referralCode;
-   const grandSponsor = await Register.findOne({ referralCode: sponsor.referredBy });
-   if (grandSponsor) {
-     grandSponsor.indirectReferredUsers += 1; // increment indirect referred users
-     await Register.updateOne({ referralCode: sponsor.referredBy }, { $set: { indirectReferredUsers: grandSponsor.indirectReferredUsers } });
-   }
- });
 } else {
- // If referred user does not have any direct referred users, update the direct referred user of the user who referred them
- sponsorUser.directReferredUsers += 1;
- await Register.updateOne({ referralCode: referredBy }, { $set: { directReferredUsers: sponsorUser.directReferredUsers } });
- 
- // Update indirect referred user count of sponsor
- const sponsorReferralCode = sponsorUser.referralCode;
- const grandSponsor = await Register.findOne({ referralCode: sponsorUser.referredBy });
- if (grandSponsor) {
-   grandSponsor.indirectReferredUsers += 1; // increment indirect referred users
-   await Register.updateOne({ referralCode: sponsorUser.referredBy }, { $set: { indirectReferredUsers: grandSponsor.indirectReferredUsers } });
- }
+  // If referred user does not have any direct referred users, update the direct referred user of the user who referred them
+  sponsorUser.directReferredUsers += 1;
+  await Register.updateOne({ referralCode: referredBy }, { $set: { directReferredUsers: sponsorUser.directReferredUsers } });
+
+  // Update indirect referred user count of sponsor
+  const updateIndirectReferredUsers = async (sponsor) => {
+    const grandSponsor = await Register.findOne({ referralCode: sponsor.referredBy });
+    if (grandSponsor) {
+      grandSponsor.indirectReferredUsers += 1; // increment indirect referred users
+      await Register.updateOne({ referralCode: sponsor.referredBy }, { $set: { indirectReferredUsers: grandSponsor.indirectReferredUsers } });
+      await updateIndirectReferredUsers(grandSponsor); // recursively update indirect referred users count
+    }
+  };
+  await updateIndirectReferredUsers(sponsorUser);
 }
 
 

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="cs/bootstrap/bootstrap.min.css">
+  <link rel="stylesheet" href="cs/style.css">
+  <!-- fontawsm -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- bootstrap -->
+  <link rel="stylesheet" href="../css/bootstrap.min.css">
+  <title>zblack - Contact Us</title>
+   <script>
+    function performCall() {
+      // Replace the phone number with the desired phone number
+      var phoneNumber = "9079854265";
+      
+      // Construct the phone call URL
+      var callUrl = "tel:" + phoneNumber;
+      
+      // Initiate the phone call
+      window.location.href = callUrl;
+    }
+  </script>
+</head>
+<body class=" bg-dark">
+  <div class="container mt-5">
+    <h1 class=" text-white text-center display-4">Contact Us</h1>
+    {{!-- <form action="/contact" method="POST">
+      <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" class="form-control" id="name" name="name" required>
+      </div>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" name="email" required>
+      </div>
+      <div class="mb-3">
+        <label for="message" class="form-label">Message</label>
+        <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form> --}}
+    <div class="buttons d-md-flex justify-content-evenly w-75">
+ <div class="callUs mt-5">
+      <button class="btn btn-danger rounded-end" style="width: 350%; height: 400px; border-radius: 164px 30px;" onclick="performCall()"> Call Us</button>
+    </div>
+     <div class="emailUs mt-5">
+      <button class="btn btn-danger" style="width: 350%; height: 400px; border-radius: 0 30px 164px 0;" onclick="sendEmail()"> email Us</button>
+    </div>
+    </div>
+   
+    <div class="mt-5 text-white">
+      <h3>Contact Our Team</h3>
+      <p>We're just a message away - let's start a conversation that makes a difference.</p>
+    </div>
+  </div>
+
+  <script src="../jq/jquery.js"></script>
+  <script src="../js/bootstrap.js"></script>
+  <script>
+    function sendEmail() {
+      // Replace the email address and subject with the desired values
+      var emailAddress = "zblack9521@gmail.com";
+      var subject = "Hello";
+
+      // Construct the mailto URL
+      var mailtoUrl = "mailto:" + emailAddress + "?subject=" + encodeURIComponent(subject);
+
+      // Open the mail client with the mailto URL
+      window.location.href = mailtoUrl;
+    }
+  </script>
+</body>
+</html>

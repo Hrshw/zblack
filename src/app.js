@@ -66,7 +66,9 @@ app.get('/', (req, res) => {
 app.get('/about', (req, res) => {
   res.render('about');
 });
-
+app.get('/support', (req, res) => {
+  res.render('support');
+});
 app.get('/checkout', auth, (req, res) => {
   if (!req.user) {
     // User is not authenticated, show error message or redirect to login page
@@ -306,7 +308,37 @@ app.get('/validate-otp/:otp', (req, res) => {
 });
 
 
+app.post('/contact', (req, res) => {
+  const { name, email, message } = req.body;
 
+  // Create a transporter with your email service configuration
+  const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+      user: 'your-email@gmail.com', // Replace with your email address
+      pass: 'your-password' // Replace with your email password
+    }
+  });
+
+  // Set up the email details
+  const mailOptions = {
+    from: 'your-email@gmail.com', // Sender's email address
+    to: 'recipient@example.com', // Recipient's email address
+    subject: 'New Contact Form Submission',
+    text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`
+  };
+
+  // Send the email
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log('Error:', error);
+      res.send('Error sending message');
+    } else {
+      console.log('Email sent:', info.response);
+      res.send('Message sent successfully!');
+    }
+  });
+});
 
 app.get('/check-existing', async (req, res) => {
   const { username, email, phone } = req.query;

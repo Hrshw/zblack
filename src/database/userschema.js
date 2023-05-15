@@ -96,7 +96,11 @@ const userschema = new mongoose.Schema({
             type: String,
             required: true
         }
-    }]
+    }],
+    paymentMade: {
+        type: Boolean,
+        default: false
+    }
 });
 
 

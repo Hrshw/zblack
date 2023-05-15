@@ -29,6 +29,7 @@
     "otplib": "^12.0.1",
     "shortid": "^2.2.16",
     "speakeasy": "^2.0.0",
+    "stripe": "^12.5.0",
     "winston": "^3.8.2"
   }
 }

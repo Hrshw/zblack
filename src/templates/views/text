@@ -1,0 +1,29 @@
+<div class="navbar position-absolute w-100">
+  <nav class="navbar navbar-expand-lg navbar-dark w-100" style="z-index: 2;">
+    <div class="container-fluid nav-gap">
+      <a class="navbar-brand" href="/"><img src="images/logo.png" alt="logo"></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-link" href="/">Home</a>
+          <a class="nav-link" href="/about">About</a>
+          <a class="nav-link " aria-current="page" href="/signUp">SignUp</a>
+          <a class="nav-link" href="/login">LogIn</a>
+          <a class="nav-link" href="/user">My Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</div>
+  <div class=" d-flex flex-column justify-content-center align-items-center position-absolute " style="top: 30%;">
+    <p class="text-light text-center" style="font-size: 20px; width: 80%;">Our package offers lifetime access to our service for just <span class=" text-danger">200</span> rupees. Plus, users can earn coins by referring
+      others to our platform - they'll get 20 coins for each new user, and an additional 10 coins for every new user
+      referred by their own referrals. These coins can be redeemed for additional rewards or features, making it even
+      more valuable to be a part of our community.
+
+      With our referral program, users can easily share our package with their friends and family, earning valuable
+      coins in the process. It's a win-win situation - our users get lifetime access to our service, and they can earn
+      rewards simply by spreading the word to others.</p>

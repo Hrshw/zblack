@@ -18,6 +18,7 @@ const handleReferral = require('./controllers/updatecoins');
 const { updateBankDetails } = require('./controllers/bankdetails');
 const session = require('express-session');
 const fast2sms = require('fast-two-sms');
+const stripe = require('stripe')(process.env.STRIPE_SECRET);
 const speakeasy = require('speakeasy');
 const cors = require('cors')
 
@@ -308,38 +309,7 @@ app.get('/validate-otp/:otp', (req, res) => {
 });
 
 
-app.post('/contact', (req, res) => {
-  const { name, email, message } = req.body;
-
-  // Create a transporter with your email service configuration
-  const transporter = nodemailer.createTransport({
-    service: 'Gmail',
-    auth: {
-      user: 'your-email@gmail.com', // Replace with your email address
-      pass: 'your-password' // Replace with your email password
-    }
-  });
-
-  // Set up the email details
-  const mailOptions = {
-    from: 'your-email@gmail.com', // Sender's email address
-    to: 'recipient@example.com', // Recipient's email address
-    subject: 'New Contact Form Submission',
-    text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`
-  };
-
-  // Send the email
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.log('Error:', error);
-      res.send('Error sending message');
-    } else {
-      console.log('Email sent:', info.response);
-      res.send('Message sent successfully!');
-    }
-  });
-});
-
+// check if user is already registerd with userName, Email, Phone
 app.get('/check-existing', async (req, res) => {
   const { username, email, phone } = req.query;
 
@@ -364,6 +334,65 @@ app.get('/check-existing', async (req, res) => {
 
   return res.status(200).json({ message: 'No user found with this username, email, or phone number' });
 });
+
+
+
+
+// Handle the payment webhook from Stripe
+app.post('/webhook', bodyParser.raw({ type: 'application/json' }), async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, process.env.WEBHOOK_KEY);
+  } catch (err) {
+    console.error('Webhook signature verification failed.', err);
+    return res.sendStatus(400);
+  }
+
+  const payload = event.data.object;
+  const eventType = event.type;
+
+  // Handle the payment_intent.succeeded event
+  if (eventType === 'payment_intent.succeeded') {
+    const paymentIntent = payload;
+    const paymentMethodId = paymentIntent.payment_method;
+    const amount = paymentIntent.amount;
+    const currency = paymentIntent.currency;
+
+    try {
+      // Find the user and save the payment data
+      const user = await Register.findOne({ 'bankDetails.paymentMethodId': paymentMethodId });
+
+      if (!user) {
+        console.error('User not found.');
+        return res.status(404).send({ error: 'User not found.' });
+      }
+
+      const payment = {
+        amount,
+        currency,
+        paymentId: paymentIntent.id,
+      };
+
+      // Save the payment data to the user's payments array
+      user.payments.push(payment);
+      await user.save();
+
+      console.log('Payment saved successfully.');
+      return res.sendStatus(200);
+    } catch (err) {
+      console.error('Error saving payment:', err);
+      return res.status(500).send({ error: 'An error occurred while processing the payment.' });
+    }
+  } else {
+    console.log('Ignoring event type:', eventType);
+    return res.sendStatus(200);
+  }
+});
+
+
+
 
 // Withdraw Router
 app.post('/withdraw', async (req, res) => {

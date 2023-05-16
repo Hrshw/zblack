@@ -2,24 +2,6 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const paymentSchema = new mongoose.Schema({
-    amount: {
-      type: Number,
-      required: true
-    },
-    currency: {
-      type: String,
-      required: true
-    },
-    paymentId: {
-      type: String,
-      required: true
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now
-    }
-  });
 
 const userschema = new mongoose.Schema({
     username: {
@@ -87,7 +69,6 @@ const userschema = new mongoose.Schema({
         type: Number,
         default: 0,
       },
-    payments: [paymentSchema], // Use the defined paymentSchema for payments array
     bankDetails: {
       bankName: { type: String, default: null },
       accountNumber: { type: String, default: null },

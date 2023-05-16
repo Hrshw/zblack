@@ -410,6 +410,29 @@ app.post('/webhook', async (req, res) => {
       console.error('Failed to save payment:', error);
       return res.status(500).send('Failed to save payment');
     }
+  }else if (event.type === 'payment_intent.payment_failed') {
+    // Handle payment_intent.payment_failed event
+
+    const paymentIntent = event.data.object;
+    const userEmail = session.customer_details.email;
+
+    try {
+      const user = await Register.findOne({ email: userEmail });
+
+      if (!user) {
+        console.error('User not found');
+        return res.status(404).send('User not found');
+      }
+
+      // Update user's paymentMade flag to false
+      user.paymentMade = false;
+      await user.save();
+
+      console.log('Payment failed for user:', user);
+    } catch (error) {
+      console.error('Failed to update payment:', error);
+      return res.status(500).send('Failed to update payment');
+    }
   }
 
   res.status(200).send();

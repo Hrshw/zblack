@@ -1,37 +1,77 @@
+<!-- checkout.hbs -->
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Buy cool new product</title>
-    <link rel="stylesheet" href="cs/style.css">
-    <script async src="https://js.stripe.com/v3/buy-button.js"></script>
-  </head>
-  <body>
- <div id="payment-form">
-  <h3>Make a Payment</h3>
-  <stripe-buy-button
-    buy-button-id="buy_btn_1N81eASAT3NUFt3MpIkEmxLO"
-    publishable-key="pk_test_51N7zKOSAT3NUFt3Mk15ZiqnrDvH9zrsw4qs0dc7tfpHG7WN4vweS2MPNKcXkTm7hsWp4D5gflGiMFsSsB9a2Lyg400yIBi6iBZ"
-  >
-  </stripe-buy-button>
-  <div id="payment-result"><!-- Payment result will be displayed here --></div>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+       <link rel="stylesheet" href="cs/style.css">
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <!-- fontawsm -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body class="bg-dark">
+  <div class="navbar position-absolute w-100">
+  <nav class="navbar navbar-expand-lg navbar-dark w-100" style="z-index: 2;">
+    <div class="container-fluid nav-gap">
+      <a class="navbar-brand" href="/"><img src="images/logo.png" alt="logo"></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-link" href="/">Home</a>
+          <a class="nav-link" href="/about">About</a>
+          <a class="nav-link " aria-current="page" href="/signUp">SignUp</a>
+          <a class="nav-link" href="/login">LogIn</a>
+          <a class="nav-link" href="/user">My Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </nav>
 </div>
+  <div class=" d-flex flex-column justify-content-center align-items-center position-absolute " style="top: 30%;">
+    <p class="text-light text-center" style="font-size: 20px; width: 80%;">Our package offers lifetime access to our service for just <span class=" text-danger">200</span> rupees. Plus, users can earn coins by referring
+      others to our platform - they'll get 20 coins for each new user, and an additional 10 coins for every new user
+      referred by their own referrals. These coins can be redeemed for additional rewards or features, making it even
+      more valuable to be a part of our community.
 
-<script src="https://js.stripe.com/v3/"></script>
-<script>
-  // Initialize Stripe.js
-  const stripe = Stripe('pk_test_51N7zKOSAT3NUFt3Mk15ZiqnrDvH9zrsw4qs0dc7tfpHG7WN4vweS2MPNKcXkTm7hsWp4D5gflGiMFsSsB9a2Lyg400yIBi6iBZ');
+      With our referral program, users can easily share our package with their friends and family, earning valuable
+      coins in the process. It's a win-win situation - our users get lifetime access to our service, and they can earn
+      rewards simply by spreading the word to others.</p>
+    <button id="checkout-button" class="btn btn-danger">Pay Now</button>
+  </div>
 
-  // Handle the payment result
-  const paymentResult = document.getElementById('payment-result');
-  stripe.elements().on('stripe-buy-button:result', function (event) {
-    if (event.error) {
-      // Display error message to the user
-      paymentResult.textContent = event.error.message;
-    } else {
-      // Payment succeeded, you can perform additional actions here
-      paymentResult.textContent = 'Payment successful!';
-    }
-  });
-</script>
-  </body>
+
+
+
+    <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="../jq/jquery.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        // Set your Stripe publishable key
+        const stripe = Stripe('pk_test_51N7zKOSAT3NUFt3Mk15ZiqnrDvH9zrsw4qs0dc7tfpHG7WN4vweS2MPNKcXkTm7hsWp4D5gflGiMFsSsB9a2Lyg400yIBi6iBZ');
+
+        // Handle the checkout button click event
+        document.getElementById('checkout-button').addEventListener('click', async () => {
+            const response = await fetch('/create-checkout-session', {
+                method: 'POST',
+            });
+            const session = await response.json();
+
+            // Redirect the user to the checkout page
+            const result = await stripe.redirectToCheckout({
+                sessionId: session.id,
+            });
+
+            if (result.error) {
+                console.error(result.error.message);
+                // Handle error
+            }
+        });
+    </script>
+</body>
 </html>

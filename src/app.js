@@ -17,17 +17,22 @@ const { validateReferralCode } = require('./middleware/checkReferrels');
 const handleReferral = require('./controllers/updatecoins');
 const { updateBankDetails } = require('./controllers/bankdetails');
 const session = require('express-session');
+var MemoryStore = require('memorystore')(session)
 const fast2sms = require('fast-two-sms');
 const stripe = require('stripe')(process.env.STRIPE_SECRET);
 const speakeasy = require('speakeasy');
-const cors = require('cors')
-
+const cors = require('cors');
 
 app.use(session({
   secret: process.env.SECRET_KEY,
   resave: false,
-  saveUninitialized: true
+  cookie: { maxAge: 86400000 },
+  store: new MemoryStore({
+    checkPeriod: 86400000 // prune expired entries every 24h
+  }),
+  saveUninitialized: false
 }));
+app.use('/webhook', bodyParser.raw({ type: 'application/json' }))
 
 // database related code
 require("./database/conn");
@@ -46,8 +51,8 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
-const urlencoded = bodyParser.urlencoded({ extended: false });
-
+app.use(bodyParser.json());
+const urlencoded = bodyParser.urlencoded({ extended: true });
 
 // middlewares
 app.use('/css', express.static(path.join(__dirname, "../node_modules/bootstrap/dist/css")));
@@ -76,7 +81,7 @@ app.get('/checkout', auth, (req, res) => {
     res.send('You must be logged in to access the checkout page.');
   } else {
     // User is authenticated, render the checkout page
-    res.render('checkout');
+    res.render('checkout', { amount: 999 });
   }
 });
 
@@ -164,8 +169,13 @@ app.get('/user', auth, async (req, res) => {
 
     const userCount = await getUserCount();
     const userLoggedIn = true; // Set userLoggedIn to true since the user is logged in
+  
+    let paymentAmount;
+    if (user.paymentMade) {
+      paymentAmount = user.paymentAmount;
+    }
 
-    res.render('user', { user, userCount, directCoins, indirectCoins, userLoggedIn });
+    res.render('user', { user, userCount, directCoins, indirectCoins, userLoggedIn, paymentAmount });
   } catch (error) {
     if (error.name === 'JsonWebTokenError') {
       return res.redirect('/login');
@@ -309,6 +319,8 @@ app.get('/validate-otp/:otp', (req, res) => {
 });
 
 
+
+
 // check if user is already registerd with userName, Email, Phone
 app.get('/check-existing', async (req, res) => {
   const { username, email, phone } = req.query;
@@ -337,87 +349,101 @@ app.get('/check-existing', async (req, res) => {
 
 
 
+// Create a checkout session
+app.post('/create-checkout-session', async (req, res) => {
+  const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+          {
+              price_data: {
+                  currency: 'inr',
+                  product_data: {
+                      name: 'Widget',
+                  },
+                  unit_amount: 20000, // Amount in smallest currency unit (200 INR)
+              },
+              quantity: 1,
+          },
+      ],
+      mode: 'payment',
+      success_url: 'http://localhost:3000/success.html',
+      cancel_url: 'http://localhost:3000/cancel.html',
+  });
 
-// Handle the payment webhook from Stripe
-app.post('/webhook', bodyParser.raw({ type: 'application/json' }), async (req, res) => {
+  res.json({ id: session.id });
+});
+
+
+app.use(bodyParser.raw({ type: 'application/json' }));
+
+app.post('/webhook', async (req, res) => {
   const sig = req.headers['stripe-signature'];
   let event;
 
   try {
     event = stripe.webhooks.constructEvent(req.body, sig, process.env.WEBHOOK_KEY);
   } catch (err) {
-    console.error('Webhook signature verification failed.', err);
-    return res.sendStatus(400);
+    console.error(err);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  const payload = event.data.object;
-  const eventType = event.type;
-
-  // Handle the payment_intent.succeeded event
-  if (eventType === 'payment_intent.succeeded') {
-    const paymentIntent = payload;
-    const paymentMethodId = paymentIntent.payment_method;
-    const amount = paymentIntent.amount;
-    const currency = paymentIntent.currency;
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    const userEmail = session.customer_details.email; // Retrieve the email from the session
+    const amount = session.amount_total / 100;
 
     try {
-      // Find the user and save the payment data
-      const user = await Register.findOne({ 'bankDetails.paymentMethodId': paymentMethodId });
+      const user = await Register.findOne({ email: userEmail });
 
       if (!user) {
-        console.error('User not found.');
-        return res.status(404).send({ error: 'User not found.' });
+        console.error('User not found');
+        return res.status(404).send('User not found');
       }
 
-      const payment = {
-        amount,
-        currency,
-        paymentId: paymentIntent.id,
-      };
-
-      // Save the payment data to the user's payments array
-      user.payments.push(payment);
+      // Store the payment amount in the user's schema
+      user.paymentAmount = amount;
+      user.paymentMade = true;
       await user.save();
 
-      console.log('Payment saved successfully.');
-      return res.sendStatus(200);
-    } catch (err) {
-      console.error('Error saving payment:', err);
-      return res.status(500).send({ error: 'An error occurred while processing the payment.' });
+      console.log('Payment saved for user:', user);
+    } catch (error) {
+      console.error('Failed to save payment:', error);
+      return res.status(500).send('Failed to save payment');
     }
-  } else {
-    console.log('Ignoring event type:', eventType);
-    return res.sendStatus(200);
   }
+
+  res.status(200).send();
 });
+
+
 
 
 
 
 // Withdraw Router
-app.post('/withdraw', async (req, res) => {
-  try {
-    const { bankName, accountNumber, amount } = req.body;
-    const user = await Register.findById(req.user._id);
-    const bank = await Bank.findOne({ name: bankName });
-    if (!bank) {
-      return res.status(400).json({ message: "Bank not found" });
-    }
-    if (user.coins < amount) {
-      return res.status(400).json({ message: "Insufficient balance" });
-    }
-    // Deduct amount from user's coins
-    user.coins -= amount;
-    await user.save();
-    // Update bank's balance
-    bank.balance += amount;
-    await bank.save();
-    return res.json({ message: "Withdrawal successful" });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "Server error" });
-  }
-});
+// app.post('/withdraw', async (req, res) => {
+//   try {
+//     const { bankName, accountNumber, amount } = req.body;
+//     const user = await Register.findById(req.user._id);
+//     const bank = await Bank.findOne({ name: bankName });
+//     if (!bank) {
+//       return res.status(400).json({ message: "Bank not found" });
+//     }
+//     if (user.coins < amount) {
+//       return res.status(400).json({ message: "Insufficient balance" });
+//     }
+//     // Deduct amount from user's coins
+//     user.coins -= amount;
+//     await user.save();
+//     // Update bank's balance
+//     bank.balance += amount;
+//     await bank.save();
+//     return res.json({ message: "Withdrawal successful" });
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ message: "Server error" });
+//   }
+// });
 
 // checkreferralcode
 app.get('/check-referral-code/:referralCode', async (req, res) => {

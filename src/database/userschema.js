@@ -83,6 +83,10 @@ const userschema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    paymentAmount: {
+        type: Number,
+        default: 0,
+      },
     payments: [paymentSchema], // Use the defined paymentSchema for payments array
     bankDetails: {
       bankName: { type: String, default: null },

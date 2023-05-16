@@ -135,15 +135,22 @@
             <div class="col py-3 mt-5">
 
                 <div class="userSection">
+                    <div class="bg-danger text-white text-center rounded">
+                        {{#unless user.paymentMade}}
+                        <p>Get the package otherwise your account will be suspended in 2 days.</p>
+                        {{/unless}}
+                    </div>
                     <div class="bg-info mb-5 text-center rounded">
-                        <p class="text-light fs-2">Thank you for your patience as we work diligently to provide you with
+                        <p class="text-light fs-2 mt-2">Thank you for your patience as we work diligently to provide you
+                            with
                             exceptional service. 😊</p>
                     </div>
                     <div class="row justify-content-evenly">
                         <div class="userInfo bg-light rounded-4 p-3 col-md-4">
                             <h4 class="card-title text-center text-info fs-3">User Profile</h4>
                             <hr>
-                            <h6 class="">User Name: <span class="text-info m-1 text-danger text-uppercase">{{user.username}}</span>
+                            <h6 class="">User Name: <span
+                                    class="text-info m-1 text-danger text-uppercase">{{user.username}}</span>
                             </h6>
                             <h6 class="">Mobile: <span class="text-info m-1">{{user.phone}}</span></h6>
                             <h6 class="">Referral Code: <span class="text-info m-1">{{user.referralCode}}</span></h6>
@@ -194,6 +201,16 @@
                             </p>
                             <p class=" fs-4">Company Team</p>
                         </div>
+                        {{#if user.paymentMade}}
+                        <div class="withdrawal bg-light rounded-4 p-2 col-md-2 mt-4 mt-md-0">
+
+                            <p class="text-danger fs-3">
+                               ₹ {{ user.paymentAmount }}
+                            </p>
+                            <p class="fs-4">Your payment amount</p>
+
+                        </div>
+                        {{/if}}
                     </div>
                 </div>
 
@@ -216,7 +233,8 @@
                         </div>
                         <div class="form-group text-light">
                             <label for="accountNumberVerification">Verify Account Number:</label>
-                            <input type="text" class="form-control" id="accountNumberVerification" name="accountNumberVerification">
+                            <input type="text" class="form-control" id="accountNumberVerification"
+                                name="accountNumberVerification">
                             <div class="error text-danger"></div>
                         </div>
 
@@ -260,34 +278,41 @@
                 <div class="showDetailsSection d-none p-4 rounded-4" style="background-color: darkseagreen;">
 
                     {{#if user.bankDetails.bankName}}
-                    <h3 class="ms-4 mb-4 text-white">Your Name: <span class="text-uppercase" style="color: rgb(0, 253, 236);">{{ user.username }}</span>
+                    <h3 class="ms-4 mb-4 text-white">Your Name: <span class="text-uppercase"
+                            style="color: rgb(0, 253, 236);">{{ user.username }}</span>
                     </h3>
-                    <h3 class="ms-4 mb-4 text-white">Bank Name: <span class="text-uppercase" style="color: rgb(0, 253, 236);">{{ user.bankDetails.bankName }}</span>
+                    <h3 class="ms-4 mb-4 text-white">Bank Name: <span class="text-uppercase"
+                            style="color: rgb(0, 253, 236);">{{ user.bankDetails.bankName }}</span>
                     </h3>
-                    <h3 class="ms-4 mb-4 text-white">Account Number: <span style="color: rgb(0, 253, 236);">{{ user.bankDetails.accountNumber
+                    <h3 class="ms-4 mb-4 text-white">Account Number: <span style="color: rgb(0, 253, 236);">{{
+                            user.bankDetails.accountNumber
                             }}</span></h3>
-                    <h3 class="ms-4 mb-4 text-white">IFSC Code: <span class=" text-uppercase" style="color: rgb(0, 253, 236);">{{ user.bankDetails.ifscCode }}</span>
+                    <h3 class="ms-4 mb-4 text-white">IFSC Code: <span class=" text-uppercase"
+                            style="color: rgb(0, 253, 236);">{{ user.bankDetails.ifscCode }}</span>
                     </h3>
                     {{#if user.bankDetails.panCard}}
-                    <h3 class="ms-4 mb-4 text-white">PAN Card: <span class=" text-uppercase" style="color: rgb(0, 253, 236);">{{ user.bankDetails.panCard }}</span></h3>
+                    <h3 class="ms-4 mb-4 text-white">PAN Card: <span class=" text-uppercase"
+                            style="color: rgb(0, 253, 236);">{{ user.bankDetails.panCard }}</span></h3>
                     {{/if}}
 
                     {{#if user.bankDetails.aadharCard}}
-                    <h3 class="ms-4 mb-4 text-white">Aadhar Card: <span class=" text-uppercase" style="color: rgb(0, 253, 236);">{{ user.bankDetails.aadharCard }}</span>
+                    <h3 class="ms-4 mb-4 text-white">Aadhar Card: <span class=" text-uppercase"
+                            style="color: rgb(0, 253, 236);">{{ user.bankDetails.aadharCard }}</span>
                     </h3>
                     {{/if}}
-                    <h3 class="ms-4 mb-4 text-white">Your ReferralCode: <span class="text-uppercase" style="color: rgb(0, 253, 236);">{{ user.referralCode }}</span>
+                    <h3 class="ms-4 mb-4 text-white">Your ReferralCode: <span class="text-uppercase"
+                            style="color: rgb(0, 253, 236);">{{ user.referralCode }}</span>
                     </h3>
-                     <button class="shareReferralLinkButton btn btn-danger text-center">Share your referral Link</button>
-                            <div class="socialMediaIconsContainer" style="display: none;">
-                                <img src="images/icons/meta.svg" alt="Facebook" data-platform="Facebook"
-                                    class="socialMediaIcon">
-                                <img src="images/icons/square-twitter.svg" alt="Twitter" data-platform="Twitter"
-                                    class="socialMediaIcon">
-                                <img src="images/icons/whatsapp.svg" alt="WhatsApp" data-platform="WhatsApp"
-                                    class="socialMediaIcon">
-                                <!-- Add more social media icons as needed -->
-                            </div>
+                    <button class="shareReferralLinkButton btn btn-danger text-center">Share your referral Link</button>
+                    <div class="socialMediaIconsContainer" style="display: none;">
+                        <img src="images/icons/meta.svg" alt="Facebook" data-platform="Facebook"
+                            class="socialMediaIcon">
+                        <img src="images/icons/square-twitter.svg" alt="Twitter" data-platform="Twitter"
+                            class="socialMediaIcon">
+                        <img src="images/icons/whatsapp.svg" alt="WhatsApp" data-platform="WhatsApp"
+                            class="socialMediaIcon">
+                        <!-- Add more social media icons as needed -->
+                    </div>
                     {{else}}
                     <p class="text-white fs-4">Please fill in your bank details.</p>
                     {{!-- <button id="fillBankDetailsButton">Fill Bank Details</button> --}}
@@ -365,9 +390,14 @@
                 <div class="contactUsSection d-none rounded-3 p-3 ml-3 d-grid justify-content-center"
                     style="background-color:darkseagreen;">
                     <h3 class="text-center fs-2">Contact Us <span class=" text-danger">:</span></h3>
-                    <p class="fs-3 text-white">If you have any inquiries or if there's anything on your mind, please don't hesitate to reach out to us via email. We are here to assist you and address any questions or concerns you may have. Your feedback and queries are valuable to us, and we'll be more than happy to help you in any way we can. Drop us a line, and let's embark on this journey together! : <a class=" text-decoration-none fs-4 btn btn-danger" href="mailto:zblack9521@gmail.com" style="color: rgb(0, 253, 236);">email us</a></p>
-                    
-                       
+                    <p class="fs-3 text-white">If you have any inquiries or if there's anything on your mind, please
+                        don't hesitate to reach out to us via email. We are here to assist you and address any questions
+                        or concerns you may have. Your feedback and queries are valuable to us, and we'll be more than
+                        happy to help you in any way we can. Drop us a line, and let's embark on this journey together!
+                        : <a class=" text-decoration-none fs-4 btn btn-danger" href="mailto:zblack9521@gmail.com"
+                            style="color: rgb(0, 253, 236);">email us</a></p>
+
+
 
                 </div>
 
@@ -379,45 +409,45 @@
     <script src="../jq/jquery.js"></script>
     <script src="js/user.js"></script>
     <script>
-        
+
         const shareReferralLinkButtons = document.querySelectorAll('.shareReferralLinkButton');
         const socialMediaIconsContainers = document.querySelectorAll('.socialMediaIconsContainer');
         const socialMediaIcons = document.querySelectorAll('.socialMediaIcon');
         const referralCode = "{{user.referralCode}}"; // Assuming user.referralCode contains the referral code
-        
+
         const handleShareButtonClick = (socialMediaIconsContainer) => {
-          socialMediaIconsContainer.style.display = 'block';
+            socialMediaIconsContainer.style.display = 'block';
         };
-        
+
         shareReferralLinkButtons.forEach((button, index) => {
-          button.addEventListener('click', () => {
-            handleShareButtonClick(socialMediaIconsContainers[index]);
-          });
+            button.addEventListener('click', () => {
+                handleShareButtonClick(socialMediaIconsContainers[index]);
+            });
         });
-        
+
         socialMediaIcons.forEach(icon => {
-          icon.addEventListener('click', () => {
-            const platform = icon.dataset.platform;
-            let shareLink;
-        
-            switch (platform) {
-              case 'Facebook':
-                shareLink = `https://www.facebook.com/sharer.php?u=${encodeURIComponent(`https://zblack.in/signUp?referral=${referralCode}`)}`;
-                break;
-              case 'Twitter':
-                shareLink = `https://twitter.com/intent/tweet?url=${encodeURIComponent(`https://zblack.in/signUp?referral=${referralCode}`)}`;
-                break;
-              case 'WhatsApp':
-                shareLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(`Join me on ZBlack and earn rewards! Sign up using my referral link: https://zblack.in/signUp?referral=${referralCode}`)}`;
-                break;
-              // Add more cases for other social media platforms if needed
-              default:
-                alert('Invalid platform. Please try again.');
-                return;
-            }
-        
-            window.open(shareLink);
-          });
+            icon.addEventListener('click', () => {
+                const platform = icon.dataset.platform;
+                let shareLink;
+
+                switch (platform) {
+                    case 'Facebook':
+                        shareLink = `https://www.facebook.com/sharer.php?u=${encodeURIComponent(`https://zblack.in/signUp?referral=${referralCode}`)}`;
+                        break;
+                    case 'Twitter':
+                        shareLink = `https://twitter.com/intent/tweet?url=${encodeURIComponent(`https://zblack.in/signUp?referral=${referralCode}`)}`;
+                        break;
+                    case 'WhatsApp':
+                        shareLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(`Join me on ZBlack and earn rewards! Sign up using my referral link: https://zblack.in/signUp?referral=${referralCode}`)}`;
+                        break;
+                    // Add more cases for other social media platforms if needed
+                    default:
+                        alert('Invalid platform. Please try again.');
+                        return;
+                }
+
+                window.open(shareLink);
+            });
         });
     </script>
 </body>

@@ -22,6 +22,7 @@ const fast2sms = require('fast-two-sms');
 const stripe = require('stripe')(process.env.STRIPE_SECRET);
 const speakeasy = require('speakeasy');
 const cors = require('cors');
+const jwt = require("jsonwebtoken");
 
 app.use(session({
   secret: process.env.SECRET_KEY,
@@ -32,7 +33,19 @@ app.use(session({
   }),
   saveUninitialized: false
 }));
-app.use('/webhook', bodyParser.raw({ type: 'application/json' }))
+
+
+// Add a function to delete expired tokens
+async function deleteExpiredTokens(user) {
+  const currentDate = new Date();
+  const updatedTokens = user.tokens.filter((token) => {
+    const tokenExpirationDate = jwt.decode(token.token).exp * 1000;
+    return tokenExpirationDate > currentDate;
+  });
+
+  user.tokens = updatedTokens;
+  await user.save();
+}
 
 // database related code
 require("./database/conn");
@@ -60,6 +73,7 @@ app.use('/js', express.static(path.join(__dirname, "../node_modules/bootstrap/di
 app.use('/js', express.static(path.join(__dirname, "../node_modules/bootstrap/dist/bundle.min.js")));
 app.use('/jq', express.static(path.join(__dirname, "../node_modules/jquery/dist")));
 app.use('/js', express.static(path.join(__dirname, "../node_modules/validate.js")));
+app.use('/webhook', bodyParser.raw({ type: 'application/json' }))
 app.use(express.static(staticpath));
 app.set("view engine", "hbs");
 app.set("views", templetespath);
@@ -81,7 +95,7 @@ app.get('/checkout', auth, (req, res) => {
     res.send('You must be logged in to access the checkout page.');
   } else {
     // User is authenticated, render the checkout page
-    res.render('checkout', { amount: 999 });
+    res.render('checkout');
   }
 });
 
@@ -169,11 +183,13 @@ app.get('/user', auth, async (req, res) => {
 
     const userCount = await getUserCount();
     const userLoggedIn = true; // Set userLoggedIn to true since the user is logged in
-  
+
     let paymentAmount;
     if (user.paymentMade) {
       paymentAmount = user.paymentAmount;
     }
+    // Delete expired tokens
+    await deleteExpiredTokens(user);
 
     res.render('user', { user, userCount, directCoins, indirectCoins, userLoggedIn, paymentAmount });
   } catch (error) {
@@ -213,7 +229,7 @@ app.post('/signup', validateReferralCode, userRegistrationValidator, urlencoded,
 
   const { username, email, phone, otp, password, confirmpassword, referredUsers } = req.body;
 
-   // Verify OTP
+  // Verify OTP
   //  const secret = process.env.SECRET_KEY;
   //  const isOTPValid = speakeasy.totp.verify({ secret, token: otp, window: 5 * 60 });
   //  if (!isOTPValid) {
@@ -352,22 +368,22 @@ app.get('/check-existing', async (req, res) => {
 // Create a checkout session
 app.post('/create-checkout-session', async (req, res) => {
   const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: [
-          {
-              price_data: {
-                  currency: 'inr',
-                  product_data: {
-                      name: 'Widget',
-                  },
-                  unit_amount: 20000, // Amount in smallest currency unit (200 INR)
-              },
-              quantity: 1,
+    payment_method_types: ['card'],
+    line_items: [
+      {
+        price_data: {
+          currency: 'inr',
+          product_data: {
+            name: 'Widget',
           },
-      ],
-      mode: 'payment',
-      success_url: 'http://localhost:3000/success.html',
-      cancel_url: 'http://localhost:3000/cancel.html',
+          unit_amount: 20000, // Amount in smallest currency unit (200 INR)
+        },
+        quantity: 1,
+      },
+    ],
+    mode: 'payment',
+    success_url: 'http://localhost:3000/success.html',
+    cancel_url: 'http://localhost:3000/cancel.html',
   });
 
   res.json({ id: session.id });
@@ -410,7 +426,7 @@ app.post('/webhook', async (req, res) => {
       console.error('Failed to save payment:', error);
       return res.status(500).send('Failed to save payment');
     }
-  }else if (event.type === 'payment_intent.payment_failed') {
+  } else if (event.type === 'payment_intent.payment_failed') {
     // Handle payment_intent.payment_failed event
 
     const paymentIntent = event.data.object;

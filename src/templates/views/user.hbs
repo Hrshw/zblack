@@ -153,8 +153,10 @@
                                     class="text-info m-1 text-danger text-uppercase">{{user.username}}</span>
                             </h6>
                             <h6 class="">Mobile: <span class="text-info m-1">{{user.phone}}</span></h6>
+                            <h6 class="">Email ID: <span class="text-info m-1">{{user.email}}</span></h6>
                             <h6 class="">Referral Code: <span class="text-info m-1">{{user.referralCode}}</span></h6>
                             <h6 class="">Sponsor ID: <span class="text-info m-1">{{user.sponsorId}}</span></h6>
+                            <div id="message" style="display: none;"></div>
                             <button class="shareReferralLinkButton btn btn-danger">Share your referral Link</button>
                             <div class="socialMediaIconsContainer" style="display: none;">
                                 <img src="images/icons/meta.svg" alt="Facebook" data-platform="Facebook"
@@ -167,14 +169,14 @@
                             </div>
                         </div>
                         <div class="balance bg-light rounded-4 p-2 col-md-4 mt-4 mt-md-0">
-                            <p class=" text-danger fs-3">{{user.coins}}</p>
-                            <p class=" fs-4">Available Balance</p>
+                            <p class=" fs-1 text-center mb-4">Available Balance</p>
+                            <p class=" text-danger text-center fs-1">{{user.coins}}</p>
                         </div>
                         <div class="withdrawal bg-light rounded-4 p-2 col-md-2 mt-4 mt-md-0">
-                            <p class="text-danger fs-3">
+                            <p class=" fs-2 text-center">Total Revenue</p>
+                            <p class="text-danger fs-3 text-center">
                                 {{user.coins}}
                             </p>
-                            <p class=" fs-4">Total Revenue</p>
                         </div>
                     </div>
                     <div class="row mt-5 justify-content-evenly">
@@ -205,7 +207,7 @@
                         <div class="withdrawal bg-light rounded-4 p-2 col-md-2 mt-4 mt-md-0">
 
                             <p class="text-danger fs-3">
-                               ₹ {{ user.paymentAmount }}
+                                ₹ {{ user.paymentAmount }}
                             </p>
                             <p class="fs-4">Your payment amount</p>
 
@@ -410,44 +412,63 @@
     <script src="js/user.js"></script>
     <script>
 
-        const shareReferralLinkButtons = document.querySelectorAll('.shareReferralLinkButton');
-        const socialMediaIconsContainers = document.querySelectorAll('.socialMediaIconsContainer');
-        const socialMediaIcons = document.querySelectorAll('.socialMediaIcon');
-        const referralCode = "{{user.referralCode}}"; // Assuming user.referralCode contains the referral code
+   const shareReferralLinkButtons = document.querySelectorAll('.shareReferralLinkButton');
+const socialMediaIconsContainers = document.querySelectorAll('.socialMediaIconsContainer');
+const socialMediaIcons = document.querySelectorAll('.socialMediaIcon');
+const referralCode = "{{user.referralCode}}"; // Assuming user.referralCode contains the referral code
+const indirectReferredUsers = "{{user.indirectReferredUsers}}";
+const directReferredUsers = "{{user.directReferredUsers}}";
 
-        const handleShareButtonClick = (socialMediaIconsContainer) => {
-            socialMediaIconsContainer.style.display = 'block';
-        };
+const handleShareButtonClick = (socialMediaIconsContainer) => {
+  // Check if the user has reached the referral limit
+  const totalReferralCount = parseInt(directReferredUsers) + parseInt(indirectReferredUsers);
+  const referralLimit = 1024;
 
-        shareReferralLinkButtons.forEach((button, index) => {
-            button.addEventListener('click', () => {
-                handleShareButtonClick(socialMediaIconsContainers[index]);
-            });
-        });
+  if (totalReferralCount >= referralLimit) {
+    // User has reached the maximum referral limit, show the message
+    const messageDiv = document.getElementById('message');
+    messageDiv.textContent = 'successfully You have reached the maximum referral limit.';
+    messageDiv.style.display = 'block';
 
-        socialMediaIcons.forEach(icon => {
-            icon.addEventListener('click', () => {
-                const platform = icon.dataset.platform;
-                let shareLink;
+    // Hide the social media icons container
+    socialMediaIconsContainer.style.display = 'none';
+  } else {
+    // User can proceed with sharing the referral link
+    socialMediaIconsContainer.style.display = 'block';
+  }
+};
 
-                switch (platform) {
-                    case 'Facebook':
-                        shareLink = `https://www.facebook.com/sharer.php?u=${encodeURIComponent(`https://zblack.in/signUp?referral=${referralCode}`)}`;
-                        break;
-                    case 'Twitter':
-                        shareLink = `https://twitter.com/intent/tweet?url=${encodeURIComponent(`https://zblack.in/signUp?referral=${referralCode}`)}`;
-                        break;
-                    case 'WhatsApp':
-                        shareLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(`Join me on ZBlack and earn rewards! Sign up using my referral link: https://zblack.in/signUp?referral=${referralCode}`)}`;
-                        break;
-                    // Add more cases for other social media platforms if needed
-                    default:
-                        alert('Invalid platform. Please try again.');
-                        return;
-                }
+shareReferralLinkButtons.forEach((button, index) => {
+  button.addEventListener('click', () => {
+    handleShareButtonClick(socialMediaIconsContainers[index]);
+  });
+});
 
-                window.open(shareLink);
-            });
-        });
+socialMediaIcons.forEach(icon => {
+  icon.addEventListener('click', () => {
+    const platform = icon.dataset.platform;
+    let shareLink;
+
+    switch (platform) {
+      case 'Facebook':
+        shareLink = `https://www.facebook.com/sharer.php?u=${encodeURIComponent(`https://zblack.in/signUp?referral=${referralCode}`)}`;
+        break;
+      case 'Twitter':
+        shareLink = `https://twitter.com/intent/tweet?url=${encodeURIComponent(`https://zblack.in/signUp?referral=${referralCode}`)}`;
+        break;
+      case 'WhatsApp':
+        shareLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(`Join me on ZBlack and earn rewards! Sign up using my referral link: https://zblack.in/signUp?referral=${referralCode}`)}`;
+        break;
+      // Add more cases for other social media platforms if needed
+      default:
+        alert('Invalid platform. Please try again.');
+        return;
+    }
+
+    window.open(shareLink);
+  });
+});
+
+
     </script>
 </body>

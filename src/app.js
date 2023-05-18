@@ -98,6 +98,12 @@ app.get('/checkout', auth, (req, res) => {
     res.render('checkout');
   }
 });
+app.get('/resetpassword', (req, res) =>{
+  res.render('resetpassword');
+})
+app.get('/forgotpassword', (req, res) =>{
+  res.render('forgotpassword');
+})
 
 app.get('/login', (req, res) => {
   res.render('login');
@@ -331,6 +337,63 @@ app.get('/validate-otp/:otp', (req, res) => {
   } else {
     // OTP is not valid
     return res.status(400).send({ isValidOTP: false, error: 'Invalid OTP. Please enter a valid OTP.' });
+  }
+});
+
+
+// Route for handling forgot password form submission
+app.post('/forgot-password', async (req, res) => {
+  const { mobileNumber } = req.body;
+
+  try {
+    // Find the user in the database based on the provided mobile number
+    const user = await Register.findOne({ phone: mobileNumber });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Generate a unique token for password reset
+    const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
+
+    // Update the user document with the generated token
+    user.resetPasswordToken = token;
+    await user.save();
+
+    // Send the password reset SMS to the user
+    const resetLink = `https://zblack.in/reset-password?token=${token}`; // Replace with your application's reset password URL
+    const message = `Click the link below to reset your password:\n\n${resetLink}`;
+    const response = await fast2sms.sendMessage({ authorization: process.env.APIKEYFAST, message, numbers: [mobileNumber] });
+
+    res.json({ message: 'Password reset instructions sent to your mobile number.' });
+  } catch (error) {
+    console.error('Failed to process password reset request:', error);
+    res.status(500).json({ error: 'Failed to process password reset request' });
+  }
+});
+
+// Route for handling password reset form submission
+app.post('/reset-password', async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    // Verify the token and find the user associated with it
+    const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
+    const user = await Register.findOne({ _id: decodedToken.userId, resetPasswordToken: token });
+
+    if (!user) {
+      return res.status(404).send('Invalid or expired token');
+    }
+
+    // Update the user's password with the new password
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.resetPasswordToken = undefined;
+    await user.save();
+
+    res.send('Password reset successful!');
+  } catch (error) {
+    console.error('Failed to reset password:', error);
+    res.status(500).send('Failed to reset password');
   }
 });
 

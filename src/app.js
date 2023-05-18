@@ -16,6 +16,7 @@ const { userRegistrationValidator } = require('./middleware/validate');
 const { validateReferralCode } = require('./middleware/checkReferrels');
 const handleReferral = require('./controllers/updatecoins');
 const { updateBankDetails } = require('./controllers/bankdetails');
+const sendPasswordResetSMS = require('./controllers/sendPasswordreset')
 const session = require('express-session');
 var MemoryStore = require('memorystore')(session)
 const fast2sms = require('fast-two-sms');
@@ -65,7 +66,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-const urlencoded = bodyParser.urlencoded({ extended: true });
+const urlencoded = bodyParser.urlencoded({ extended: false });
 
 // middlewares
 app.use('/css', express.static(path.join(__dirname, "../node_modules/bootstrap/dist/css")));
@@ -98,10 +99,10 @@ app.get('/checkout', auth, (req, res) => {
     res.render('checkout');
   }
 });
-app.get('/resetpassword', (req, res) =>{
+app.get('/resetpassword', (req, res) => {
   res.render('resetpassword');
 })
-app.get('/forgotpassword', (req, res) =>{
+app.get('/forgotpassword', (req, res) => {
   res.render('forgotpassword');
 })
 
@@ -361,9 +362,10 @@ app.post('/forgot-password', async (req, res) => {
     await user.save();
 
     // Send the password reset SMS to the user
-    const resetLink = `https://zblack.in/reset-password?token=${token}`; // Replace with your application's reset password URL
+    const resetLink = `${req.protocol}://${req.get('host')}/resetpassword?token=${token}`;
     const message = `Click the link below to reset your password:\n\n${resetLink}`;
-    const response = await fast2sms.sendMessage({ authorization: process.env.APIKEYFAST, message, numbers: [mobileNumber] });
+    // Replace the following line with your SMS service implementation
+    sendPasswordResetSMS(mobileNumber, message);
 
     res.json({ message: 'Password reset instructions sent to your mobile number.' });
   } catch (error) {
@@ -396,6 +398,7 @@ app.post('/reset-password', async (req, res) => {
     res.status(500).send('Failed to reset password');
   }
 });
+
 
 
 

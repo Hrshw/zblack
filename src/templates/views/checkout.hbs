@@ -1,78 +1,179 @@
 <!-- checkout.hbs -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout</title>
-       <link rel="stylesheet" href="cs/style.css">
-    <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <!-- fontawsm -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout</title>
+  <link rel="stylesheet" href="cs/style.css">
+  <link rel="stylesheet" href="../css/bootstrap.min.css">
+  <!-- fontawsm -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  {{!-- bootstrap icons --}}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css"
+    integrity="sha384-b6lVK+yci+bfDmaY1u0zE8YYJt0TZxLEAFyYSLHId4xoVvsrQu3INevFKo+Xir8e" crossorigin="anonymous">
+
+  <style>
+    /* Additional custom styles for the payment form */
+    .payment-form {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+
 </head>
+
 <body class="bg-dark">
-  <div class="navbar position-absolute w-100">
-  <nav class="navbar navbar-expand-lg navbar-dark w-100" style="z-index: 2;">
-    <div class="container-fluid nav-gap">
-      <a class="navbar-brand" href="/"><img src="images/logo.png" alt="logo"></a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
-        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-          <a class="nav-link" href="/">Home</a>
-          <a class="nav-link" href="/about">About</a>
-          <a class="nav-link " aria-current="page" href="/signUp">SignUp</a>
-          <a class="nav-link" href="/login">LogIn</a>
-          <a class="nav-link" href="/user">My Dashboard</a>
+  <div class="navbar w-100">
+    <nav class="navbar navbar-expand-lg navbar-dark w-100" style="z-index: 2;">
+      <div class="container-fluid nav-gap">
+        <a class="navbar-brand" href="/"><img src="images/logo.png" alt="logo"></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+          aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+            <a class="nav-link" href="/">Home</a>
+            <a class="nav-link" href="/about">About</a>
+            <a class="nav-link " aria-current="page" href="/signUp">SignUp</a>
+            <a class="nav-link" href="/login">LogIn</a>
+            <a class="nav-link" href="/user">My Dashboard</a>
+          </div>
         </div>
       </div>
+    </nav>
+  </div>
+  <div id="bankPayment">
+    <div class="d-flex flex-column justify-content-center align-items-center" style="top: 30%;">
+      <p class="text-light text-center" style="font-size: 20px; width: 80%;">
+        Our package offers lifetime access to our service for just <span class="text-danger">200</span> rupees. Plus,
+        users can earn coins by referring others to our platform - they'll get 20 coins for each new user, and an
+        additional 10 coins for every new user referred by their own referrals. These coins can be redeemed for
+        additional rewards or features, making it even more valuable to be a part of our community.
+        With our referral program, users can easily share our package with their friends and family, earning valuable
+        coins in the process. It's a win-win situation - our users get lifetime access to our service, and they can earn
+        rewards simply by spreading the word to others.
+      </p>
+      <h4 class="text-info mt-2 w-75">Please ensure that you provide the same e-mail address you used during the signup
+        process. Failure to do so may result in your hard-earned money slipping through the cracks. Stay on the safe
+        side and enter your correct e-mail address to secure your funds.</h4>
+      <button id="checkout-button" class="btn btn-danger">Pay Now</button>
+      <button id="qrCodeScannerBtn" class="btn btn-light mt-5">Or Scan <i class="fa fa-qrcode text-danger"
+          aria-hidden="true"></i></button>
     </div>
-  </nav>
-</div>
-  <div class=" d-flex flex-column justify-content-center align-items-center position-absolute " style="top: 30%;">
-    <p class="text-light text-center" style="font-size: 20px; width: 80%;">Our package offers lifetime access to our service for just <span class=" text-danger">200</span> rupees. Plus, users can earn coins by referring
-      others to our platform - they'll get 20 coins for each new user, and an additional 10 coins for every new user
-      referred by their own referrals. These coins can be redeemed for additional rewards or features, making it even
-      more valuable to be a part of our community.
-
-      With our referral program, users can easily share our package with their friends and family, earning valuable
-      coins in the process. It's a win-win situation - our users get lifetime access to our service, and they can earn
-      rewards simply by spreading the word to others.</p>
-      <h4 class="text-info mt-2 w-75">Please ensure that you provide the same e-mail address you used during the signup process. Failure to do so may result in your hard-earned money slipping through the cracks. Stay on the safe side and enter your correct e-mail address to secure your funds.</h4>
-    <button id="checkout-button" class="btn btn-danger">Pay Now</button>
   </div>
 
 
+<div class="payment-form w-auto m-auto text-center">
+  <h1 class="text-white mb-4">QR Code Scanner</h1>
+  <div class="payInfo">
+    <h3 class="text-info">Please note:</h3>
+    <p class="text-info">Make sure to pay the exact amount of 200 rupees.</p>
+    <p class="text-info">If you pay less than 200 rupees, we will not be responsible for processing your payment.</p>
+    <p class="text-info">Enjoy your lifetime access and start earning rewards!</p>
+  </div>
+  <img src="images/phonepescanner.jpg" alt="QR Code" id="qrCodeImage" width="300" height="300">
+  <div class="inputGroup d-flex justify-content-evenly">
+    <input type="text" id="userName" class="form-control w-25" placeholder="Your Name">
+    <input type="text" id="paymentField" class="form-control w-25" placeholder="Amount">
+    <input type="file" id="screenshotUpload" class="form-control w-25" accept="image/*">
+  </div>
+  <button id="submitBtn" class="btn btn-danger mt-4 mb-3">Submit</button>
+
+  <div id="paymentStatus"></div>
+</div>
+<div class="success-message text-white text-center">
+  {{ successMessage }}
+</div>
 
 
-    <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
-    <script src="../jq/jquery.js"></script>
-    <script src="https://js.stripe.com/v3/"></script>
-    <script>
-        // Set your Stripe publishable key
-        const stripe = Stripe('pk_live_51N7zKOSAT3NUFt3MblGTvgdEizGnlX9TWbKtIFr49CkxbmsQilSf2KSywOTFylieevp20j7FXzuQvB8QBpiCioHU00QpNC0nck');
+  {{> footer}}
 
-        // Handle the checkout button click event
-        document.getElementById('checkout-button').addEventListener('click', async () => {
-            const response = await fetch('/create-checkout-session', {
-                method: 'POST',
-            });
-            const session = await response.json();
 
-            // Redirect the user to the checkout page
-            const result = await stripe.redirectToCheckout({
-                sessionId: session.id,
-            });
 
-            if (result.error) {
-                console.error(result.error.message);
-                // Handle error
-            }
+
+
+  <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
+  <script src="../jq/jquery.js"></script>
+
+  <script src="https://js.stripe.com/v3/"></script>
+  <script>
+    // Set your Stripe publishable key
+    const stripe = Stripe('pk_live_51N7zKOSAT3NUFt3MblGTvgdEizGnlX9TWbKtIFr49CkxbmsQilSf2KSywOTFylieevp20j7FXzuQvB8QBpiCioHU00QpNC0nck');
+
+    // Handle the checkout button click event
+    document.getElementById('checkout-button').addEventListener('click', async () => {
+      const response = await fetch('/create-checkout-session', {
+        method: 'POST',
+      });
+      const session = await response.json();
+
+      // Redirect the user to the checkout page
+      const result = await stripe.redirectToCheckout({
+        sessionId: session.id,
+      });
+
+      if (result.error) {
+        console.error(result.error.message);
+        // Handle error
+      }
+    });
+
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const qrCodeScannerBtn = document.getElementById('qrCodeScannerBtn');
+      const bankPayment = document.getElementById('bankPayment');
+      const paymentForm = document.querySelector('.payment-form');
+
+      qrCodeScannerBtn.addEventListener('click', () => {
+        bankPayment.style.display = 'none';
+        paymentForm.style.display = 'block';
+      });
+
+    });
+
+
+    // Front-end code to handle the payment submission
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.addEventListener('click', () => {
+      const paymentField = document.getElementById('paymentField').value;
+      const userName = document.getElementById('userName').value;
+      const screenshotUpload = document.getElementById('screenshotUpload').files[0];
+
+      const formData = new FormData();
+      formData.append('paymentAmount', paymentField);
+      formData.append('userName', userName);
+      formData.append('screenshot', screenshotUpload);
+
+      fetch('/process-payment', {
+        method: 'POST',
+        body: formData
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Error occurred while processing payment');
+          }
+          return response.json();
+        })
+        .then(data => {
+          document.getElementById('paymentStatus').textContent = data.message;
+          // Redirect to the user page
+          window.location.href = data.userLink;
+        })
+        .catch(error => {
+          console.error(error);
         });
-    </script>
+    });
+
+
+
+  </script>
 </body>
+
 </html>

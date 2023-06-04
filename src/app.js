@@ -1,6 +1,8 @@
 require('dotenv').config({ path: '../.env' });
 const express = require('express');
+const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 const app = express();
 // const axios = require('axios');
 const hbs = require("hbs");
@@ -16,7 +18,8 @@ const { userRegistrationValidator } = require('./middleware/validate');
 const { validateReferralCode } = require('./middleware/checkReferrels');
 const handleReferral = require('./controllers/updatecoins');
 const { updateBankDetails } = require('./controllers/bankdetails');
-const sendPasswordResetSMS = require('./controllers/sendPasswordreset')
+// const sendPasswordResetSMS = require('./controllers/sendPasswordreset')
+const sendinblue = require('sendinblue-api');
 const session = require('express-session');
 var MemoryStore = require('memorystore')(session)
 const fast2sms = require('fast-two-sms');
@@ -24,6 +27,8 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET);
 const speakeasy = require('speakeasy');
 const cors = require('cors');
 const jwt = require("jsonwebtoken");
+
+
 
 app.use(session({
   secret: process.env.SECRET_KEY,
@@ -61,6 +66,29 @@ const partialspath = path.join(__dirname, "templates/partials");
 
 // Enable CORS for all routes
 app.use(cors());
+
+
+// Set the storage engine
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = 'uploads'; // Specify the destination directory
+
+    // Create the destination directory if it doesn't exist
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    // Generate a unique filename for the uploaded file
+    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage: storage });
+
+
 
 app.use(express.json());
 app.use(cookieParser());
@@ -236,12 +264,6 @@ app.post('/signup', validateReferralCode, userRegistrationValidator, urlencoded,
 
   const { username, email, phone, otp, password, confirmpassword, referredUsers } = req.body;
 
-  // Verify OTP
-  //  const secret = process.env.SECRET_KEY;
-  //  const isOTPValid = speakeasy.totp.verify({ secret, token: otp, window: 5 * 60 });
-  //  if (!isOTPValid) {
-  //    return res.render('signup', { alert: [{ msg: 'Invalid OTP. Please enter a valid OTP.' }] });
-  //  }
   const referredBy = req.referrer ? req.referrer.referralCode : null;
   const registeruser = new Register({
     username,
@@ -299,6 +321,36 @@ app.post('/signup', validateReferralCode, userRegistrationValidator, urlencoded,
 });
 
 
+// QR Code process
+app.post('/process-payment', upload.single('screenshot'), (req, res) => {
+  const paymentAmount = req.body.paymentAmount;
+  const screenshotPath = req.file.path;
+  const userName = req.body.userName;
+  const userId = req.session.userId;
+
+  Register.findByIdAndUpdate(
+    userId,
+    {
+      paymentAmount: paymentAmount,
+      'qrCodeDetails.paymentMade': true,
+      'qrCodeDetails.userName': userName,
+      'qrCodeDetails.screenshot': screenshotPath,
+      paymentMade: true
+    },
+    { new: true }
+  )
+    .then(user => {
+      if (!user) {
+        throw new Error('User not found');
+      }
+      res.json({ message: 'Data submitted successfully', userLink: '/user' });
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(500).json({ error: 'Error occurred while processing payment' });
+    });
+});
+
 
 
 
@@ -311,8 +363,6 @@ app.post('/sendotp', async (req, res) => {
     digits: 6,
     window: 5 * 60 // OTP will be valid for 5 minutes
   });
-  console.log('the otp is:', otp);
-  console.log('to the mobile number:', phoneNumber);
   const options = {
     authorization: process.env.APIKEYFAST,
     message: `Your OTP for verification is ${otp} valid upto 5 Min.`,
@@ -320,10 +370,8 @@ app.post('/sendotp', async (req, res) => {
   };
   try {
     const response = await fast2sms.sendMessage(options);
-    console.log(response);
     res.status(200).json({ success: true });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ success: false, message: 'Failed to send OTP' });
   }
 });
@@ -342,13 +390,16 @@ app.get('/validate-otp/:otp', (req, res) => {
 });
 
 
+// Create a Sendinblue client
+const sendinblueClient = new sendinblue({ apiKey: process.env.SENDINBLUE_API_KEY });
+
 // Route for handling forgot password form submission
 app.post('/forgot-password', async (req, res) => {
-  const { mobileNumber } = req.body;
+  const { email } = req.body;
 
   try {
-    // Find the user in the database based on the provided mobile number
-    const user = await Register.findOne({ phone: mobileNumber });
+    // Find the user in the database based on the provided email
+    const user = await Register.findOne({ email });
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -361,13 +412,28 @@ app.post('/forgot-password', async (req, res) => {
     user.resetPasswordToken = token;
     await user.save();
 
-    // Send the password reset SMS to the user
-    const resetLink = `${req.protocol}://${req.get('host')}/resetpassword?token=${token}`;
-    const message = `Click the link below to reset your password:\n\n${resetLink}`;
-    // Replace the following line with your SMS service implementation
-    sendPasswordResetSMS(mobileNumber, message);
+    // Create the password reset link
+    const resetLink = `${req.protocol}://${req.get('host')}/reset-password?token=${token}`;
 
-    res.json({ message: 'Password reset instructions sent to your mobile number.' });
+    // Send the password reset email
+    const emailOptions = {
+      to: email,
+      from: 'zblack9521@gmail.com', // Replace with your email address
+      subject: 'Password Reset Request',
+      text: `Click the link below to reset your password:\n\n${resetLink}`,
+    };
+
+    // Send the email using Sendinblue client
+    sendinblueClient.send_email(emailOptions, (err, response) => {
+      if (err) {
+        console.error('Failed to send password reset email:', err);
+        res.status(500).json({ error: 'Failed to send password reset email' });
+      } else {
+        console.log('Sendinblue API response:', response); // Add this line
+        console.log('Password reset email sent successfully');
+        res.json({ message: 'Password reset instructions sent to your email.' });
+      }
+    });    
   } catch (error) {
     console.error('Failed to process password reset request:', error);
     res.status(500).json({ error: 'Failed to process password reset request' });
@@ -428,6 +494,7 @@ app.get('/check-existing', async (req, res) => {
 
   return res.status(200).json({ message: 'No user found with this username, email, or phone number' });
 });
+
 
 
 

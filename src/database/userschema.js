@@ -82,10 +82,23 @@ const userschema = new mongoose.Schema({
             required: true
         }
     }],
+    qrCodeDetails: {
+        screenshot: {
+            type: String,
+            default: null,
+          },
+          userName: { type: String, default: '' }
+
+    },
     paymentMade: {
         type: Boolean,
         default: false
-    }
+    },
+  
+    resetPasswordToken: {
+        type: String,
+        default: null,
+      }
 });
 
 

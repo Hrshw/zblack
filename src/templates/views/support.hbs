@@ -4,9 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
-    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="cs/style.css">
+  <link rel="stylesheet" href="../css/bootstrap.min.css">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
     integrity="sha384-pzjw8o+yNMCGA+V8h3yXn536p6b+B6q5r8ZngfT+lp4al8fZST6/kDkYL0gFcPh" crossorigin="anonymous">
   <title>zblack - Contact Us</title>
@@ -67,6 +66,7 @@
     }
 
     @media (max-width: 576px) {
+
       .btn-call,
       .btn-email {
         width: 100%;
@@ -76,6 +76,7 @@
 </head>
 
 <body>
+  {{>navbar}}
   <div class="container">
     <h1 class="text-center">Contact Us</h1>
     <div class="buttons">
@@ -93,6 +94,9 @@
     </div>
   </div>
 
+
+  <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
+  <script src="../jq/jquery.js"></script>
   <script>
     function performCall() {
       var phoneNumber = "9079854265";
@@ -113,4 +117,5 @@
     }
   </script>
 </body>
+
 </html>

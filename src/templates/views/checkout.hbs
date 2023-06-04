@@ -79,9 +79,9 @@
   </div>
   <img src="images/phonepescanner.jpg" alt="QR Code" id="qrCodeImage" width="300" height="300">
   <div class="inputGroup d-flex justify-content-evenly">
-    <input type="text" id="userName" class="form-control w-25" placeholder="Your Name">
-    <input type="text" id="paymentField" class="form-control w-25" placeholder="Amount">
-    <input type="file" id="screenshotUpload" class="form-control w-25" accept="image/*">
+    <input type="text" id="userName" class="form-control w-25" placeholder="Your Name" required>
+    <input type="text" id="paymentField" class="form-control w-25" placeholder="Amount" required>
+    <input type="file" id="screenshotUpload" class="form-control w-25" accept="image/*" required>
   </div>
   <button id="submitBtn" class="btn btn-danger mt-4 mb-3">Submit</button>
 
@@ -139,37 +139,43 @@
     });
 
 
-    // Front-end code to handle the payment submission
-    const submitBtn = document.getElementById('submitBtn');
-    submitBtn.addEventListener('click', () => {
-      const paymentField = document.getElementById('paymentField').value;
-      const userName = document.getElementById('userName').value;
-      const screenshotUpload = document.getElementById('screenshotUpload').files[0];
+ const submitBtn = document.getElementById('submitBtn');
+submitBtn.addEventListener('click', () => {
+  const paymentField = document.getElementById('paymentField').value;
+  const userName = document.getElementById('userName').value;
+  const screenshotUpload = document.getElementById('screenshotUpload').files[0];
 
-      const formData = new FormData();
-      formData.append('paymentAmount', paymentField);
-      formData.append('userName', userName);
-      formData.append('screenshot', screenshotUpload);
+  // Check if any field is empty
+  if (!paymentField || !userName || !screenshotUpload) {
+    alert('Please fill in all the fields');
+    return; // Exit the function without submitting
+  }
 
-      fetch('/process-payment', {
-        method: 'POST',
-        body: formData
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Error occurred while processing payment');
-          }
-          return response.json();
-        })
-        .then(data => {
-          document.getElementById('paymentStatus').textContent = data.message;
-          // Redirect to the user page
-          window.location.href = data.userLink;
-        })
-        .catch(error => {
-          console.error(error);
-        });
+  const formData = new FormData();
+  formData.append('paymentAmount', paymentField);
+  formData.append('userName', userName);
+  formData.append('screenshot', screenshotUpload);
+
+  fetch('/process-payment', {
+    method: 'POST',
+    body: formData
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Error occurred while processing payment');
+      }
+      return response.json();
+    })
+    .then(data => {
+      document.getElementById('paymentStatus').textContent = data.message;
+      // Redirect to the user page
+      window.location.href = data.userLink;
+    })
+    .catch(error => {
+      console.error(error);
     });
+});
+
 
 
 

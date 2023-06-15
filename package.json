@@ -9,7 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@sendgrid/mail": "^7.7.0",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.0",
     "body-parser": "^1.20.2",
@@ -31,10 +30,8 @@
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.3",
     "otplib": "^12.0.1",
-    "sendinblue-api": "^1.0.8",
     "shortid": "^2.2.16",
     "speakeasy": "^2.0.0",
-    "stripe": "^12.5.0",
-    "winston": "^3.8.2"
+    "stripe": "^12.5.0"
   }
 }

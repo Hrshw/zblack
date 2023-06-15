@@ -112,7 +112,9 @@ app.set("view engine", "hbs");
 app.set("views", templetespath);
 hbs.registerPartials(partialspath);
 
+// Serve static files from the 'uploads' directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 app.get('/', (req, res) => {
   res.render('index');
 });

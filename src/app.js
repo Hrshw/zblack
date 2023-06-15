@@ -177,7 +177,9 @@ app.post('/login', async (req, res) => {
   }
 });
 
-
+app.get('/payment-required', (req, res) => {
+  res.render('payment-required'); // Render the payment-required view
+});
 
 
 

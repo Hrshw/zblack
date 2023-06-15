@@ -4,13 +4,13 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const app = express();
-// const axios = require('axios');
+const axios = require('axios');
 const hbs = require("hbs");
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const { registerPartials } = require("hbs");
 const bodyParser = require('body-parser');
-const helpers = require('./middleware/helpers');
+// const helpers = require('./middleware/helpers');
 const auth = require("./middleware/auth");
 const { validationResult } = require('express-validator');
 const shortid = require('shortid');
@@ -18,11 +18,14 @@ const { userRegistrationValidator } = require('./middleware/validate');
 const { validateReferralCode } = require('./middleware/checkReferrels');
 const handleReferral = require('./controllers/updatecoins');
 const { updateBankDetails } = require('./controllers/bankdetails');
+// const {sendMail} = require('./controllers/forgotPasswordCont');
+const { checkPaymentStatus } = require('./middleware/checkPaymentStatus')
 // const sendPasswordResetSMS = require('./controllers/sendPasswordreset')
-const sendinblue = require('sendinblue-api');
+// const sendinblue = require('sendinblue-api');
 const session = require('express-session');
 var MemoryStore = require('memorystore')(session)
 const fast2sms = require('fast-two-sms');
+const nodemailer = require('nodemailer');
 const stripe = require('stripe')(process.env.STRIPE_SECRET);
 const speakeasy = require('speakeasy');
 const cors = require('cors');
@@ -56,6 +59,7 @@ async function deleteExpiredTokens(user) {
 // database related code
 require("./database/conn");
 const Register = require("./database/userschema");
+const { error } = require('console');
 
 const port = process.env.PORT || 3000;
 
@@ -108,7 +112,7 @@ app.set("view engine", "hbs");
 app.set("views", templetespath);
 hbs.registerPartials(partialspath);
 
-
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.get('/', (req, res) => {
   res.render('index');
 });
@@ -127,15 +131,13 @@ app.get('/checkout', auth, (req, res) => {
     res.render('checkout');
   }
 });
-app.get('/resetpassword', (req, res) => {
-  res.render('resetpassword');
-})
-app.get('/forgotpassword', (req, res) => {
-  res.render('forgotpassword');
-})
+
 
 app.get('/login', (req, res) => {
   res.render('login');
+});
+app.get('/forgotpassword', (req, res) => {
+  res.render('forgotpassword');
 });
 
 
@@ -159,19 +161,20 @@ app.post('/login', async (req, res) => {
         expires: new Date(Date.now() + 10800000),
         httpOnly: true
       });
+
       req.session.userId = user._id; // store the user ID in the session
       res.redirect('/user');
     } else {
       const errorMessage = "Invalid password!";
       res.render('login', { errorMessage });
     }
-
   } catch (error) {
     console.log(error);
     const errorMessage = "Invalid credentials!";
     res.render('login', { errorMessage });
   }
 });
+
 
 
 
@@ -202,7 +205,7 @@ app.post('/logout', auth, async (req, res) => {
 
 
 
-app.get('/user', auth, async (req, res) => {
+app.get('/user', auth, checkPaymentStatus, async (req, res) => {
   try {
     const user = await Register.findById(req.session.userId)
       .populate('referredUsers', 'coins referralCode') // populate referredUsers field with the coins and referralCode fields of referred users
@@ -390,80 +393,105 @@ app.get('/validate-otp/:otp', (req, res) => {
 });
 
 
-// Create a Sendinblue client
-const sendinblueClient = new sendinblue({ apiKey: process.env.SENDINBLUE_API_KEY });
-
-// Route for handling forgot password form submission
-app.post('/forgot-password', async (req, res) => {
+app.post("/forgotpassword", async (req, res) => {
   const { email } = req.body;
 
   try {
-    // Find the user in the database based on the provided email
     const user = await Register.findOne({ email });
-
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: "User not found" });
     }
 
-    // Generate a unique token for password reset
-    const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
+    const secret = process.env.SECRET_KEY + user.password;
+    const token = jwt.sign({ email: user.email, id: user._id }, secret, {
+      expiresIn: "15m",
+    });
+    const link = `https://zblack.in/resetpassword/${user._id}/${token}`;
 
-    // Update the user document with the generated token
-    user.resetPasswordToken = token;
-    await user.save();
+    var transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: 'codesmith62@gmail.com',
+        pass: 'acbwyzyxudwykexn'
+      },
+    });
 
-    // Create the password reset link
-    const resetLink = `${req.protocol}://${req.get('host')}/reset-password?token=${token}`;
-
-    // Send the password reset email
-    const emailOptions = {
-      to: email,
-      from: 'zblack9521@gmail.com', // Replace with your email address
-      subject: 'Password Reset Request',
-      text: `Click the link below to reset your password:\n\n${resetLink}`,
+    var mailOptions = {
+      from: "zblack9521@gmail.com",
+      to: user.email,
+      subject: "Password Reset Request",
+      text: "Click the link below to reset your password: " + link,
     };
 
-    // Send the email using Sendinblue client
-    sendinblueClient.send_email(emailOptions, (err, response) => {
-      if (err) {
-        console.error('Failed to send password reset email:', err);
-        res.status(500).json({ error: 'Failed to send password reset email' });
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        // console.log(error);
+        return res.status(500).json({ error: "Failed to send email" });
       } else {
-        console.log('Sendinblue API response:', response); // Add this line
-        console.log('Password reset email sent successfully');
-        res.json({ message: 'Password reset instructions sent to your email.' });
+        // console.log("Email sent: " + info.response);
+        res.json({ message: "Email sent successfully" });
       }
-    });    
+    });
+    // console.log(link);
   } catch (error) {
-    console.error('Failed to process password reset request:', error);
-    res.status(500).json({ error: 'Failed to process password reset request' });
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
-// Route for handling password reset form submission
-app.post('/reset-password', async (req, res) => {
-  const { token, newPassword } = req.body;
+
+
+app.get("/resetpassword/:userId/:token", (req, res) => {
+  res.render("resetpassword", {
+    bootstrapCSS: "/css/bootstrap.min.css",
+    bootstrapJS: "/js/bootstrap.min.js",
+    jquery: "/jq/jquery.min.js",
+    customCSS: "../css/style.css",
+    backgroundImage: "/images/resetpassword-bg.jpg",
+  });
+});
+
+
+app.post("/resetpassword/:userId/:token", async (req, res) => {
+  const { userId, token } = req.params;
+  const { newPassword } = req.body;
 
   try {
-    // Verify the token and find the user associated with it
-    const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
-    const user = await Register.findOne({ _id: decodedToken.userId, resetPasswordToken: token });
+    // console.log("User ID:", userId);
+    // console.log("Token:", token);
+
+    const user = await Register.findById(userId);
+    // console.log("User:", user);
 
     if (!user) {
-      return res.status(404).send('Invalid or expired token');
+      // console.log("User not found");
+      return res.status(404).json({ error: "User not found" });
     }
 
-    // Update the user's password with the new password
-    user.password = await bcrypt.hash(newPassword, 10);
-    user.resetPasswordToken = undefined;
-    await user.save();
+    const secret = process.env.SECRET_KEY + user.password;
+    // console.log("Secret:", secret);
 
-    res.send('Password reset successful!');
+    try {
+      const payload = jwt.verify(token, secret);
+      // console.log("Payload:", payload);
+
+      // Token is valid, update the user's password
+      user.password = newPassword;
+      await user.save();
+
+      console.log("Password reset successful");
+      return res.status(200).json({ message: "Password reset successful" });
+    } catch (error) {
+      // console.log("Invalid token");
+      return res.status(401).json({ error: "Invalid token" });
+    }
   } catch (error) {
-    console.error('Failed to reset password:', error);
-    res.status(500).send('Failed to reset password');
+    // console.log("Server error:", error);
+    return res.status(500).json({ error: "Server error" });
   }
 });
+
+
 
 
 

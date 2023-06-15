@@ -5,6 +5,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>user page</title>
+    <link rel="icon" href="images/logo.png" type="image/x-icon">
+    <link rel="icon" sizes="192x192" href="images/logo.png" type="image/png">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/logo.png">
+
     <link rel="stylesheet" href="cs/style.css">
     <link rel="stylesheet" href="../css/bootstrap.min.css">
     <!-- fontawsm -->
@@ -412,62 +416,62 @@
     <script src="js/user.js"></script>
     <script>
 
-   const shareReferralLinkButtons = document.querySelectorAll('.shareReferralLinkButton');
-const socialMediaIconsContainers = document.querySelectorAll('.socialMediaIconsContainer');
-const socialMediaIcons = document.querySelectorAll('.socialMediaIcon');
-const referralCode = "{{user.referralCode}}"; // Assuming user.referralCode contains the referral code
-const indirectReferredUsers = "{{user.indirectReferredUsers}}";
-const directReferredUsers = "{{user.directReferredUsers}}";
+        const shareReferralLinkButtons = document.querySelectorAll('.shareReferralLinkButton');
+        const socialMediaIconsContainers = document.querySelectorAll('.socialMediaIconsContainer');
+        const socialMediaIcons = document.querySelectorAll('.socialMediaIcon');
+        const referralCode = "{{user.referralCode}}"; // Assuming user.referralCode contains the referral code
+        const indirectReferredUsers = "{{user.indirectReferredUsers}}";
+        const directReferredUsers = "{{user.directReferredUsers}}";
 
-const handleShareButtonClick = (socialMediaIconsContainer) => {
-  // Check if the user has reached the referral limit
-  const totalReferralCount = parseInt(directReferredUsers) + parseInt(indirectReferredUsers);
-  const referralLimit = 1024;
+        const handleShareButtonClick = (socialMediaIconsContainer) => {
+            // Check if the user has reached the referral limit
+            const totalReferralCount = parseInt(directReferredUsers) + parseInt(indirectReferredUsers);
+            const referralLimit = 1024;
 
-  if (totalReferralCount >= referralLimit) {
-    // User has reached the maximum referral limit, show the message
-    const messageDiv = document.getElementById('message');
-    messageDiv.textContent = 'successfully You have reached the maximum referral limit.';
-    messageDiv.style.display = 'block';
+            if (totalReferralCount >= referralLimit) {
+                // User has reached the maximum referral limit, show the message
+                const messageDiv = document.getElementById('message');
+                messageDiv.textContent = 'successfully You have reached the maximum referral limit.';
+                messageDiv.style.display = 'block';
 
-    // Hide the social media icons container
-    socialMediaIconsContainer.style.display = 'none';
-  } else {
-    // User can proceed with sharing the referral link
-    socialMediaIconsContainer.style.display = 'block';
-  }
-};
+                // Hide the social media icons container
+                socialMediaIconsContainer.style.display = 'none';
+            } else {
+                // User can proceed with sharing the referral link
+                socialMediaIconsContainer.style.display = 'block';
+            }
+        };
 
-shareReferralLinkButtons.forEach((button, index) => {
-  button.addEventListener('click', () => {
-    handleShareButtonClick(socialMediaIconsContainers[index]);
-  });
-});
+        shareReferralLinkButtons.forEach((button, index) => {
+            button.addEventListener('click', () => {
+                handleShareButtonClick(socialMediaIconsContainers[index]);
+            });
+        });
 
-socialMediaIcons.forEach(icon => {
-  icon.addEventListener('click', () => {
-    const platform = icon.dataset.platform;
-    let shareLink;
+        socialMediaIcons.forEach(icon => {
+            icon.addEventListener('click', () => {
+                const platform = icon.dataset.platform;
+                let shareLink;
 
-    switch (platform) {
-      case 'Facebook':
-        shareLink = `https://www.facebook.com/sharer.php?u=${encodeURIComponent(`https://zblack.in/signUp?referral=${referralCode}`)}`;
-        break;
-      case 'Twitter':
-        shareLink = `https://twitter.com/intent/tweet?url=${encodeURIComponent(`https://zblack.in/signUp?referral=${referralCode}`)}`;
-        break;
-      case 'WhatsApp':
-        shareLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(`Join me on ZBlack and earn rewards! Sign up using my referral link: https://zblack.in/signUp?referral=${referralCode}`)}`;
-        break;
-      // Add more cases for other social media platforms if needed
-      default:
-        alert('Invalid platform. Please try again.');
-        return;
-    }
+                switch (platform) {
+                    case 'Facebook':
+                        shareLink = `https://www.facebook.com/sharer.php?u=${encodeURIComponent(`https://zblack.in/signUp?referral=${referralCode}`)}`;
+                        break;
+                    case 'Twitter':
+                        shareLink = `https://twitter.com/intent/tweet?url=${encodeURIComponent(`https://zblack.in/signUp?referral=${referralCode}`)}`;
+                        break;
+                    case 'WhatsApp':
+                        shareLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(`Join me on ZBlack and earn rewards! Sign up using my referral link: https://zblack.in/signUp?referral=${referralCode}`)}`;
+                        break;
+                    // Add more cases for other social media platforms if needed
+                    default:
+                        alert('Invalid platform. Please try again.');
+                        return;
+                }
 
-    window.open(shareLink);
-  });
-});
+                window.open(shareLink);
+            });
+        });
 
 
     </script>

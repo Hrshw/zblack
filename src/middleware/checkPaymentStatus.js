@@ -1,12 +1,12 @@
 const Register = require('../database/userschema');
 
-// Route handler for user page
-const checkPaymentStatus = async (req, res) => {
+// Middleware function to check payment status and account creation date
+const checkPaymentStatus = async (req, res, next) => {
   try {
     // Check if the user is logged in
     if (!req.session.userId) {
       // User is not logged in, redirect to the login page
-      return res.render('login');
+      return res.redirect('/login');
     }
 
     // Get the user data
@@ -15,11 +15,11 @@ const checkPaymentStatus = async (req, res) => {
     // Check if the user has made the payment
     if (!user.paymentMade) {
       // User has not made the payment, redirect to the payment required page
-      return res.render('payment-required');
+      return res.redirect('/payment-required');
     }
 
-    // User has made the payment, render the user page and pass the user data
-    return res.render('user', { user });
+    // User has made the payment, proceed to the next middleware or route handler
+    next();
   } catch (error) {
     console.log(error);
     // Handle errors

@@ -38,13 +38,9 @@ To run ZBlack Site on your local machine, make sure you have Node.js and MongoDB
 4. Start the application: `npm start`
 5. Access ZBlack Site in your browser at: `http://localhost:3000`
 
-## Join the Referral Revolution 🌟
-
-The ZBlack Site is a project built by passionate developers who believe in the power of referrals. We aim to create a platform that empowers users to benefit from their network while providing an exceptional user experience.
-
 ## License 📜
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
 
 ---
 
@@ -53,7 +49,3 @@ Unlock the potential of referrals with ZBlack Site! Refer friends, earn rewards,
 Have questions or feedback? Feel free to reach out or open an issue on GitHub.
 
 Happy referring! 🚀🎉
-
----
- 
-Note: This README is meant to be creative and informative. Please include the actual contact details, contributing guidelines, and license details in the actual `README.md` file on your GitHub repository.
